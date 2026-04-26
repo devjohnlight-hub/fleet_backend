@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VehiculeType {                                                                                                                              
+    moto
+    voiture                                                                                                                                        
+    camion                                                                                                                                       
+    bus
+    autre                                                                                                                                          
+  }
+                                                                                                                                                   
+  enum VehiculeStatus {                                                                                                                          
+    actif
+    maintenance
+    hors_service
+  }
+                                                                                                                                                   
+  model Vehicule {
+    id            String         @id @default(uuid())                                                                                              
+    fleetOwnerId  String                                                                                                                         
+    type          VehiculeType
+    immatriculation String       @unique                                                                                                           
+    marque        String
+    modele        String                                                                                                                           
+    annee         Int                                                                                                                            
+    statut        VehiculeStatus @default(actif)
+    photoUrl      String?                                                                                                                          
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt                                                                                                        
+    deletedAt     DateTime?                                                                                                                      
+  }                                                                                                                                                
+   
