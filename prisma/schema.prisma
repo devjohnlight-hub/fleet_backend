@@ -13,6 +13,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Company {
+  id        String      @id @default(uuid())
+  name      String
+  address   String?
+  latitude  Float?
+  longitude Float?
+  contact   String
+  email     String?
+  logoUrl   String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  deletedAt DateTime? 
+}
+
 enum VehiculeType {                                                                                                                              
     moto
     voiture                                                                                                                                        
@@ -28,17 +42,30 @@ enum VehiculeType {
   }
                                                                                                                                                    
   model Vehicule {
-    id            String         @id @default(uuid())                                                                                              
-    fleetOwnerId  String                                                                                                                         
+    id            String         @id @default(uuid())
+    fleetOwnerId  String
     type          VehiculeType
-    immatriculation String       @unique                                                                                                           
+    immatriculation String       @unique
     marque        String
-    modele        String                                                                                                                           
-    annee         Int                                                                                                                            
+    modele        String
+    annee         Int
     statut        VehiculeStatus @default(actif)
-    photoUrl      String?                                                                                                                          
+    photoUrl      String?
     createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt                                                                                                        
-    deletedAt     DateTime?                                                                                                                      
-  }                                                                                                                                                
+    updatedAt     DateTime       @updatedAt
+    deletedAt     DateTime?
+  }
+
+model FleetOwner {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  password   String?
+  googleId   String?   @unique
+  facebookId String?   @unique
+  photoUrl   String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+}                                                                                                                                                
    

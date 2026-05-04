@@ -48,4 +48,60 @@ export class VehiculeService {
 
     return this.vehiculeRepository.save(vehicule);
   }
+
+  async update(
+    id: string,
+    data: {
+      type?: VehiculeType;
+      immatriculation?: string;
+      marque?: string;
+      modele?: string;
+      annee?: number;
+      statut?: VehiculeStatus;
+      photoUrl?: string;
+    },
+  ): Promise<Vehicule> {
+    const vehicule = await this.vehiculeRepository.findById(id);
+    if (!vehicule) {
+      throw new Error(`Véhicule ${id} introuvable`);
+    }
+
+    if (
+      data.immatriculation &&
+      data.immatriculation !== vehicule.getImmatriculation()
+    ) {
+      const existing = await this.vehiculeRepository.findByImmatriculation(
+        data.immatriculation,
+      );
+      if (existing) {
+        throw new Error(
+          `Immatriculation ${data.immatriculation} déjà utilisée`,
+        );
+      }
+    }
+
+    vehicule.updateInfos(data);
+    return this.vehiculeRepository.update(vehicule);
+  }
+
+  async mettreEnMaintenance(id: string): Promise<Vehicule> {
+    const vehicule = await this.vehiculeRepository.findById(id);
+    if (!vehicule) throw new Error(`Véhicule ${id} introuvable`);
+    vehicule.mettreEnMaintenance();
+    return this.vehiculeRepository.update(vehicule);
+  }
+
+  async activer(id: string): Promise<Vehicule> {
+    const vehicule = await this.vehiculeRepository.findById(id);
+    if (!vehicule) throw new Error(`Véhicule ${id} introuvable`);
+    vehicule.activer();
+    return this.vehiculeRepository.update(vehicule);
+  }
+
+  async mettreHorsService(id: string): Promise<Vehicule> {
+    const vehicule = await this.vehiculeRepository.findById(id);
+    if (!vehicule) throw new Error(`Véhicule ${id} introuvable`);
+    vehicule.mettreHorsService();
+    return this.vehiculeRepository.update(vehicule);
+  }
 }

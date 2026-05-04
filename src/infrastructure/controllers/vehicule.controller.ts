@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { VehiculeService } from '../../core/application/services/vehicule.service';
 import { CreateVehiculeDto } from '../../core/application/dtos/create-vehicule.dto';
-import { VehiculeType } from '../../core/domain/entities/vehicule.types';
+import { UpdateVehiculeDto } from '../../core/application/dtos/update-vehicule.dto';
 
 @Controller('vehicules')
 export class VehiculeController {
@@ -11,7 +11,7 @@ export class VehiculeController {
   async create(@Body() dto: CreateVehiculeDto) {
     return this.vehiculeService.create(
       dto.fleetOwnerId,
-      dto.type as VehiculeType,
+      dto.type,
       dto.immatriculation,
       dto.marque,
       dto.modele,
@@ -28,5 +28,25 @@ export class VehiculeController {
   @Get('fleet/:fleetOwnerId')
   async findAll(@Param('fleetOwnerId') fleetOwnerId: string) {
     return this.vehiculeService.findAll(fleetOwnerId);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: UpdateVehiculeDto) {
+    return this.vehiculeService.update(id, dto);
+  }
+
+  @Patch(':id/maintenance')
+  async mettreEnMaintenance(@Param('id') id: string) {
+    return this.vehiculeService.mettreEnMaintenance(id);
+  }
+
+  @Patch(':id/activer')
+  async activer(@Param('id') id: string) {
+    return this.vehiculeService.activer(id);
+  }
+
+  @Patch(':id/hors-service')
+  async mettreHorsService(@Param('id') id: string) {
+    return this.vehiculeService.mettreHorsService(id);
   }
 }

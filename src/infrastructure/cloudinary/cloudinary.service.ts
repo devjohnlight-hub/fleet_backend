@@ -13,11 +13,15 @@ export class CloudinaryService {
     file: Express.Multer.File,
     folder: string,
   ): Promise<UploadApiResponse> {
+    const isImage = file.mimetype.startsWith('image/');
     return new Promise((resolve, reject) => {
       const uploadStream = this.cloudinary.uploader.upload_stream(
-        { folder },
+        {
+          folder: folder,
+          resource_type: isImage ? 'image' : 'raw',
+        },
         (error, result) => {
-          if (error) return reject(error);
+          if (error) return reject(new Error(error.message));
           if (!result) return reject(new Error('Upload échoué'));
           resolve(result);
         },
