@@ -6,6 +6,7 @@ import { VehiculeModule } from './infrastructure/modules/vehicule.module';
 import { FileUploadModule } from './infrastructure/modules/file-upload.module';
 import { CompanyModule } from './infrastructure/modules/company.module';
 import { FleetOwnerModule } from './infrastructure/modules/fleet-owner.module';
+import { TraccarGroupModule } from './infrastructure/modules/traccar-group.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -38,6 +39,7 @@ import { APP_GUARD } from '@nestjs/core';
     FileUploadModule,
     CompanyModule,
     FleetOwnerModule,
+    TraccarGroupModule,
   ],
   controllers: [AppController],
   providers: [
