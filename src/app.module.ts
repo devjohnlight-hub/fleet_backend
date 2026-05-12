@@ -8,6 +8,11 @@ import { CompanyModule } from './infrastructure/modules/company.module';
 import { FleetOwnerModule } from './infrastructure/modules/fleet-owner.module';
 import { TraccarGroupModule } from './infrastructure/modules/traccar-group.module';
 import { TraccarUserModule } from './infrastructure/modules/traccar-user.module';
+import { TraccarDeviceModule } from './infrastructure/modules/traccar-device.module';
+import { TraccarPositionModule } from './infrastructure/modules/traccar-position.module';
+import { TraccarSessionModule } from './infrastructure/modules/traccar-session.module';
+import { TraccarGeofenceModule } from './infrastructure/modules/traccar-geofence.module';
+import { TraccarNotificationModule } from './infrastructure/modules/traccar-notification.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -42,6 +47,11 @@ import { APP_GUARD } from '@nestjs/core';
     FleetOwnerModule,
     TraccarGroupModule,
     TraccarUserModule,
+    TraccarDeviceModule,
+    TraccarPositionModule,
+    TraccarSessionModule,
+    TraccarGeofenceModule,
+    TraccarNotificationModule,
   ],
   controllers: [AppController],
   providers: [

@@ -72,6 +72,22 @@ export class TraccarHttpClient {
     return response.json() as Promise<T>;
   }
 
+  async postForm<T>(path: string, fields: Record<string, string>): Promise<T> {
+    const body = new URLSearchParams(fields).toString();
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        Authorization: this.authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+    });
+    if (!response.ok) {
+      throw new Error(`Traccar POST FORM ${path} failed: ${response.status}`);
+    }
+    return response.json() as Promise<T>;
+  }
+
   async delete(path: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'DELETE',
