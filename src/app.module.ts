@@ -13,6 +13,7 @@ import { TraccarPositionModule } from './infrastructure/modules/traccar-position
 import { TraccarSessionModule } from './infrastructure/modules/traccar-session.module';
 import { TraccarGeofenceModule } from './infrastructure/modules/traccar-geofence.module';
 import { TraccarNotificationModule } from './infrastructure/modules/traccar-notification.module';
+import { TraccarDriverModule } from './infrastructure/modules/traccar-driver.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -52,6 +53,7 @@ import { APP_GUARD } from '@nestjs/core';
     TraccarSessionModule,
     TraccarGeofenceModule,
     TraccarNotificationModule,
+    TraccarDriverModule,
   ],
   controllers: [AppController],
   providers: [
