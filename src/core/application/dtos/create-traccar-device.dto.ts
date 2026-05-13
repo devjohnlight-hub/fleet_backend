@@ -13,6 +13,9 @@ export class CreateTraccarDeviceDto {
   @IsString()
   uniqueId!: string;
 
+  @IsString()
+  vehiculeId!: string;
+
   @IsOptional()
   @IsBoolean()
   disabled?: boolean;

@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import {
   Body,
   Controller,
@@ -10,14 +11,24 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { TraccarUserService } from '../../core/application/services/traccar-user.service';
+import { FirestoreUserService } from '../../core/application/services/firestore-user.service';
 import { CreateTraccarUserDto } from '../../core/application/dtos/create-traccar-user.dto';
 import { UpdateTraccarUserDto } from '../../core/application/dtos/update-traccar-user.dto';
+import { FirebaseAuthGuard } from '../guards/firebase-auth.guard';
+import { TraccarLinkedGuard } from '../guards/traccar-linked.guard';
 
+@UseGuards(FirebaseAuthGuard)
 @Controller('traccar/users')
 export class TraccarUserController {
-  constructor(private readonly traccarUserService: TraccarUserService) {}
+  constructor(
+    private readonly traccarUserService: TraccarUserService,
+    private readonly firestoreUserService: FirestoreUserService,
+  ) {}
 
   @Get()
   findAll(
@@ -35,8 +46,19 @@ export class TraccarUserController {
   }
 
   @Post()
-  create(@Body() dto: CreateTraccarUserDto) {
-    return this.traccarUserService.create(dto as any);
+  async create(@Body() dto: CreateTraccarUserDto, @Req() req: Request) {
+    const traccarPassword = randomBytes(16).toString('hex');
+    const traccarUser = await this.traccarUserService.create({
+      ...dto,
+      administrator: true,
+      password: traccarPassword,
+    } as any);
+    const firebaseUid = (req['user'] as { id: string }).id;
+    await this.firestoreUserService.upsert(firebaseUid, {
+      traccarUserId: traccarUser.getId(),
+      traccarPassword,
+    });
+    return traccarUser;
   }
 
   @Post('totp')

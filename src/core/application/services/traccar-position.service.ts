@@ -1,4 +1,7 @@
-import { TraccarHttpClient } from '../../../infrastructure/traccar/traccar-http.client';
+import {
+  TraccarHttpClient,
+  TraccarCredentials,
+} from '../../../infrastructure/traccar/traccar-http.client';
 import { TraccarPosition } from '../../domain/entities/traccar-position.entity';
 
 interface TraccarPositionRaw {
@@ -23,15 +26,19 @@ interface TraccarPositionRaw {
 export class TraccarPositionService {
   constructor(private readonly traccarClient: TraccarHttpClient) {}
 
-  async findAll(filters?: {
-    deviceId?: number;
-    id?: number;
-    from?: string;
-    to?: string;
-  }): Promise<TraccarPosition[]> {
+  async findAll(
+    filters?: {
+      deviceId?: number;
+      id?: number;
+      from?: string;
+      to?: string;
+    },
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarPosition[]> {
     const raws = await this.traccarClient.get<TraccarPositionRaw[]>(
       '/api/positions',
       filters,
+      credentials,
     );
     return raws.map((raw) => this.toDomain(raw));
   }

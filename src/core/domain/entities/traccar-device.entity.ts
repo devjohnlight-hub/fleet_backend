@@ -15,17 +15,43 @@ export class TraccarDevice {
     private readonly attributes: Record<string, unknown>,
   ) {}
 
-  getId(): number { return this.id; }
-  getName(): string { return this.name; }
-  getUniqueId(): string { return this.uniqueId; }
-  getStatus(): string | null { return this.status; }
-  isDisabled(): boolean { return this.disabled; }
-  getLastUpdate(): string | null { return this.lastUpdate; }
-  getPositionId(): number | null { return this.positionId; }
-  getGroupId(): number | null { return this.groupId; }
-  getPhone(): string | null { return this.phone; }
-  getModel(): string | null { return this.model; }
-  getContact(): string | null { return this.contact; }
-  getCategory(): string | null { return this.category; }
-  getAttributes(): Record<string, unknown> { return this.attributes; }
+  getId(): number {
+    return this.id;
+  }
+  getName(): string {
+    return this.name;
+  }
+  getUniqueId(): string {
+    return this.uniqueId;
+  }
+  getStatus(): string | null {
+    return this.status;
+  }
+  isDisabled(): boolean {
+    return this.disabled;
+  }
+  getLastUpdate(): string | null {
+    return this.lastUpdate;
+  }
+  getPositionId(): number | null {
+    return this.positionId;
+  }
+  getGroupId(): number | null {
+    return this.groupId;
+  }
+  getPhone(): string | null {
+    return this.phone;
+  }
+  getModel(): string | null {
+    return this.model;
+  }
+  getContact(): string | null {
+    return this.contact;
+  }
+  getCategory(): string | null {
+    return this.category;
+  }
+  getAttributes(): Record<string, unknown> {
+    return this.attributes;
+  }
 }

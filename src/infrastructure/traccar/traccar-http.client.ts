@@ -1,21 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Console } from 'node:console';
+
+export interface TraccarCredentials {
+  email: string;
+  password: string;
+}
 
 @Injectable()
 export class TraccarHttpClient {
   private readonly baseUrl: string;
-  private readonly authHeader: string;
+  private readonly adminAuthHeader: string;
 
   constructor(private readonly configService: ConfigService) {
     this.baseUrl = this.configService.getOrThrow<string>('TRACCAR_URL');
     const user = this.configService.getOrThrow<string>('TRACCAR_USER');
     const password = this.configService.getOrThrow<string>('TRACCAR_PASSWORD');
-    this.authHeader = `Basic ${Buffer.from(`${user}:${password}`).toString('base64')}`;
+    this.adminAuthHeader = `Basic ${Buffer.from(`${user}:${password}`).toString('base64')}`;
+  }
+
+  private buildAuth(credentials?: TraccarCredentials): string {
+    console.log('credentials', credentials);
+    if (credentials) {
+      return `Basic ${Buffer.from(`${credentials.email}:${credentials.password}`).toString('base64')}`;
+    }
+    return this.adminAuthHeader;
+  }
+
+  private signal(): AbortSignal {
+    return AbortSignal.timeout(10_000);
   }
 
   async get<T>(
     path: string,
     params?: Record<string, string | number | boolean | undefined>,
+    credentials?: TraccarCredentials,
   ): Promise<T> {
     const url = new URL(`${this.baseUrl}${path}`);
     if (params) {
@@ -26,7 +45,8 @@ export class TraccarHttpClient {
       }
     }
     const response = await fetch(url.toString(), {
-      headers: { Authorization: this.authHeader },
+      headers: { Authorization: this.buildAuth(credentials) },
+      signal: this.signal(),
     });
     if (!response.ok) {
       throw new Error(`Traccar GET ${path} failed: ${response.status}`);
@@ -34,37 +54,42 @@ export class TraccarHttpClient {
     return response.json() as Promise<T>;
   }
 
-  async post<T>(path: string, body: unknown): Promise<T> {
+  async post<T>(
+    path: string,
+    body: unknown,
+    credentials?: TraccarCredentials,
+  ): Promise<T> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'POST',
       headers: {
-        Authorization: this.authHeader,
+        Authorization: this.buildAuth(credentials),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    });
-    console.log({
-      method: 'POST',
-      headers: {
-        Authorization: this.authHeader,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+      signal: this.signal(),
     });
     if (!response.ok) {
-      throw new Error(`Traccar POST ${path} failed: ${response.status}`);
+      const errorBody = await response.text();
+      throw new Error(
+        `Traccar POST ${path} failed: ${response.status} — ${errorBody}`,
+      );
     }
     return response.json() as Promise<T>;
   }
 
-  async put<T>(path: string, body: unknown): Promise<T> {
+  async put<T>(
+    path: string,
+    body: unknown,
+    credentials?: TraccarCredentials,
+  ): Promise<T> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'PUT',
       headers: {
-        Authorization: this.authHeader,
+        Authorization: this.buildAuth(credentials),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+      signal: this.signal(),
     });
     if (!response.ok) {
       throw new Error(`Traccar PUT ${path} failed: ${response.status}`);
@@ -72,15 +97,20 @@ export class TraccarHttpClient {
     return response.json() as Promise<T>;
   }
 
-  async postForm<T>(path: string, fields: Record<string, string>): Promise<T> {
+  async postForm<T>(
+    path: string,
+    fields: Record<string, string>,
+    credentials?: TraccarCredentials,
+  ): Promise<T> {
     const body = new URLSearchParams(fields).toString();
     const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'POST',
       headers: {
-        Authorization: this.authHeader,
+        Authorization: this.buildAuth(credentials),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body,
+      signal: this.signal(),
     });
     if (!response.ok) {
       throw new Error(`Traccar POST FORM ${path} failed: ${response.status}`);
@@ -88,10 +118,11 @@ export class TraccarHttpClient {
     return response.json() as Promise<T>;
   }
 
-  async delete(path: string): Promise<void> {
+  async delete(path: string, credentials?: TraccarCredentials): Promise<void> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'DELETE',
-      headers: { Authorization: this.authHeader },
+      headers: { Authorization: this.buildAuth(credentials) },
+      signal: this.signal(),
     });
     if (!response.ok) {
       throw new Error(`Traccar DELETE ${path} failed: ${response.status}`);

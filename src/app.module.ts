@@ -14,6 +14,9 @@ import { TraccarSessionModule } from './infrastructure/modules/traccar-session.m
 import { TraccarGeofenceModule } from './infrastructure/modules/traccar-geofence.module';
 import { TraccarNotificationModule } from './infrastructure/modules/traccar-notification.module';
 import { TraccarDriverModule } from './infrastructure/modules/traccar-driver.module';
+import { FirebaseModule } from './infrastructure/firebase/firebase.module';
+import { FirestoreUserModule } from './infrastructure/modules/firestore-user.module';
+import { FirestoreVehicleModule } from './infrastructure/modules/firestore-vehicle.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -54,6 +57,9 @@ import { APP_GUARD } from '@nestjs/core';
     TraccarGeofenceModule,
     TraccarNotificationModule,
     TraccarDriverModule,
+    FirebaseModule,
+    FirestoreUserModule,
+    FirestoreVehicleModule,
   ],
   controllers: [AppController],
   providers: [

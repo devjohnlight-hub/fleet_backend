@@ -1,4 +1,7 @@
-import { TraccarHttpClient } from '../../../infrastructure/traccar/traccar-http.client';
+import {
+  TraccarHttpClient,
+  TraccarCredentials,
+} from '../../../infrastructure/traccar/traccar-http.client';
 import { TraccarNotification } from '../../domain/entities/traccar-notification.entity';
 
 interface TraccarNotificationRaw {
@@ -13,52 +16,73 @@ interface TraccarNotificationRaw {
 export class TraccarNotificationService {
   constructor(private readonly traccarClient: TraccarHttpClient) {}
 
-  async findAll(filters?: {
-    all?: boolean;
-    userId?: number;
-    deviceId?: number;
-    groupId?: number;
-    refresh?: boolean;
-  }): Promise<TraccarNotification[]> {
+  async findAll(
+    filters?: {
+      all?: boolean;
+      userId?: number;
+      deviceId?: number;
+      groupId?: number;
+      refresh?: boolean;
+    },
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarNotification[]> {
     const raws = await this.traccarClient.get<TraccarNotificationRaw[]>(
       '/api/notifications',
       filters,
+      credentials,
     );
     return raws.map((raw) => this.toDomain(raw));
   }
 
-  async getTypes(): Promise<{ type: string }[]> {
-    return this.traccarClient.get<{ type: string }[]>('/api/notifications/types');
+  async getTypes(credentials?: TraccarCredentials): Promise<{ type: string }[]> {
+    return this.traccarClient.get<{ type: string }[]>(
+      '/api/notifications/types',
+      undefined,
+      credentials,
+    );
   }
 
-  async sendTest(notificator: string): Promise<void> {
-    await this.traccarClient.post(`/api/notifications/test/${notificator}`, {});
+  async sendTest(notificator: string, credentials?: TraccarCredentials): Promise<void> {
+    await this.traccarClient.post(
+      `/api/notifications/test/${notificator}`,
+      {},
+      credentials,
+    );
   }
 
-  async create(data: {
-    type: string;
-    always?: boolean;
-    notificators?: string;
-    calendarId?: number;
-    attributes?: Record<string, unknown>;
-  }): Promise<TraccarNotification> {
+  async create(
+    data: {
+      type: string;
+      always?: boolean;
+      notificators?: string;
+      calendarId?: number;
+      attributes?: Record<string, unknown>;
+    },
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarNotification> {
     const raw = await this.traccarClient.post<TraccarNotificationRaw>(
       '/api/notifications',
       data,
+      credentials,
     );
     return this.toDomain(raw);
   }
 
-  async update(id: number, data: Partial<TraccarNotificationRaw>): Promise<TraccarNotification> {
+  async update(
+    id: number,
+    data: Partial<TraccarNotificationRaw>,
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarNotification> {
     const raw = await this.traccarClient.put<TraccarNotificationRaw>(
       `/api/notifications/${id}`,
       { id, ...data },
+      credentials,
     );
     return this.toDomain(raw);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.traccarClient.delete(`/api/notifications/${id}`);
+  async delete(id: number, credentials?: TraccarCredentials): Promise<void> {
+    await this.traccarClient.delete(`/api/notifications/${id}`, credentials);
   }
 
   private toDomain(raw: TraccarNotificationRaw): TraccarNotification {

@@ -16,9 +16,6 @@ export class CreateTraccarUserDto {
   @IsEmail()
   email!: string;
 
-  @IsString()
-  password!: string;
-
   @IsOptional()
   @IsString()
   phone?: string;

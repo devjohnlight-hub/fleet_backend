@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { TraccarHttpClient } from '../../../infrastructure/traccar/traccar-http.client';
 import { TraccarUser } from '../../domain/entities/traccar-user.entity';
 
@@ -41,11 +42,19 @@ export class TraccarUserService {
   }
 
   async create(data: Omit<TraccarUserRaw, 'id'>): Promise<TraccarUser> {
-    const raw = await this.traccarClient.post<TraccarUserRaw>(
-      '/api/users',
-      data,
-    );
-    return this.toDomain(raw);
+    try {
+      const raw = await this.traccarClient.post<TraccarUserRaw>(
+        '/api/users',
+        data,
+      );
+      return this.toDomain(raw);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.includes('Duplicate entry')) {
+        throw new ConflictException('Cet email existe déjà dans Traccar');
+      }
+      throw error;
+    }
   }
 
   async update(id: number, data: Partial<TraccarUserRaw>): Promise<TraccarUser> {

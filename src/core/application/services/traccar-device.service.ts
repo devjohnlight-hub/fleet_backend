@@ -1,4 +1,4 @@
-import { TraccarHttpClient } from '../../../infrastructure/traccar/traccar-http.client';
+import { TraccarHttpClient, TraccarCredentials } from '../../../infrastructure/traccar/traccar-http.client';
 import { TraccarDevice } from '../../domain/entities/traccar-device.entity';
 
 interface TraccarDeviceRaw {
@@ -20,47 +20,55 @@ interface TraccarDeviceRaw {
 export class TraccarDeviceService {
   constructor(private readonly traccarClient: TraccarHttpClient) {}
 
-  async findAll(filters?: {
-    all?: boolean;
-    userId?: number;
-    id?: number;
-    uniqueId?: string;
-  }): Promise<TraccarDevice[]> {
+  async findAll(
+    filters?: { all?: boolean; userId?: number; id?: number; uniqueId?: string },
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarDevice[]> {
     const raws = await this.traccarClient.get<TraccarDeviceRaw[]>(
       '/api/devices',
       filters,
+      credentials,
     );
     return raws.map((raw) => this.toDomain(raw));
   }
 
-  async create(data: {
-    name: string;
-    uniqueId: string;
-    disabled?: boolean;
-    groupId?: number;
-    phone?: string;
-    model?: string;
-    contact?: string;
-    category?: string;
-    attributes?: Record<string, unknown>;
-  }): Promise<TraccarDevice> {
+  async create(
+    data: {
+      name: string;
+      uniqueId: string;
+      disabled?: boolean;
+      groupId?: number;
+      phone?: string;
+      model?: string;
+      contact?: string;
+      category?: string;
+      attributes?: Record<string, unknown>;
+    },
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarDevice> {
     const raw = await this.traccarClient.post<TraccarDeviceRaw>(
       '/api/devices',
       data,
+      credentials,
     );
     return this.toDomain(raw);
   }
 
-  async update(id: number, data: Partial<TraccarDeviceRaw>): Promise<TraccarDevice> {
+  async update(
+    id: number,
+    data: Partial<TraccarDeviceRaw>,
+    credentials?: TraccarCredentials,
+  ): Promise<TraccarDevice> {
     const raw = await this.traccarClient.put<TraccarDeviceRaw>(
       `/api/devices/${id}`,
       { id, ...data },
+      credentials,
     );
     return this.toDomain(raw);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.traccarClient.delete(`/api/devices/${id}`);
+  async delete(id: number, credentials?: TraccarCredentials): Promise<void> {
+    await this.traccarClient.delete(`/api/devices/${id}`, credentials);
   }
 
   private toDomain(raw: TraccarDeviceRaw): TraccarDevice {
