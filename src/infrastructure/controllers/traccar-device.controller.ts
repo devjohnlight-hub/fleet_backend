@@ -16,7 +16,7 @@ import {
 import { Request } from 'express';
 import { TraccarDeviceService } from '../../core/application/services/traccar-device.service';
 import { FirestoreVehicleService } from '../../core/application/services/firestore-vehicle.service';
-import { TraccarCredentials } from '../traccar/traccar-http.client';
+import { TraccarCredentials, TraccarHttpClient } from '../traccar/traccar-http.client';
 import { CreateTraccarDeviceDto } from '../../core/application/dtos/create-traccar-device.dto';
 import { UpdateTraccarDeviceDto } from '../../core/application/dtos/update-traccar-device.dto';
 import { FirebaseAuthGuard } from '../guards/firebase-auth.guard';
@@ -28,6 +28,7 @@ export class TraccarDeviceController {
   constructor(
     private readonly traccarDeviceService: TraccarDeviceService,
     private readonly firestoreVehicleService: FirestoreVehicleService,
+    private readonly traccarHttpClient: TraccarHttpClient,
   ) {}
 
   private creds(req: Request): TraccarCredentials {
@@ -63,10 +64,15 @@ export class TraccarDeviceController {
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateTraccarDeviceDto) {
     const { vehiculeId, ...deviceData } = dto;
-    const device = await this.traccarDeviceService.create(deviceData, this.creds(req));
-    await this.firestoreVehicleService.update(vehiculeId, {
-      deviceId: device.getUniqueId(),
-    });
+    const traccarUserId = (req['user'] as { traccarUserId: number }).traccarUserId;
+
+    const device = await this.traccarDeviceService.create(deviceData);
+    await Promise.all([
+      this.traccarHttpClient.linkDeviceToUser(traccarUserId, device.getId()),
+      this.firestoreVehicleService.update(vehiculeId, {
+        deviceId: device.getUniqueId(),
+      }),
+    ]);
     return device;
   }
 

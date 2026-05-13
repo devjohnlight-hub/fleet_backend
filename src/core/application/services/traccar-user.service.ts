@@ -57,7 +57,10 @@ export class TraccarUserService {
     }
   }
 
-  async update(id: number, data: Partial<TraccarUserRaw>): Promise<TraccarUser> {
+  async update(
+    id: number,
+    data: Partial<TraccarUserRaw>,
+  ): Promise<TraccarUser> {
     const raw = await this.traccarClient.put<TraccarUserRaw>(
       `/api/users/${id}`,
       { id, ...data },

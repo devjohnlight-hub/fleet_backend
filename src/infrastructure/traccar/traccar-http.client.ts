@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Console } from 'node:console';
 
 export interface TraccarCredentials {
   email: string;
@@ -9,7 +8,7 @@ export interface TraccarCredentials {
 
 @Injectable()
 export class TraccarHttpClient {
-  private readonly baseUrl: string;
+  readonly baseUrl: string;
   private readonly adminAuthHeader: string;
 
   constructor(private readonly configService: ConfigService) {
@@ -20,7 +19,6 @@ export class TraccarHttpClient {
   }
 
   private buildAuth(credentials?: TraccarCredentials): string {
-    console.log('credentials', credentials);
     if (credentials) {
       return `Basic ${Buffer.from(`${credentials.email}:${credentials.password}`).toString('base64')}`;
     }
@@ -127,5 +125,42 @@ export class TraccarHttpClient {
     if (!response.ok) {
       throw new Error(`Traccar DELETE ${path} failed: ${response.status}`);
     }
+  }
+
+  async linkDeviceToUser(
+    traccarUserId: number,
+    traccarDeviceId: number,
+  ): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/permissions`, {
+      method: 'POST',
+      headers: {
+        Authorization: this.adminAuthHeader,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: traccarUserId,
+        deviceId: traccarDeviceId,
+      }),
+      signal: this.signal(),
+    });
+    if (!response.ok) {
+      throw new Error(`Traccar link device to user failed: ${response.status}`);
+    }
+  }
+
+  async getSessionCookie(email: string, password: string): Promise<string> {
+    const body = new URLSearchParams({ email, password }).toString();
+    const response = await fetch(`${this.baseUrl}/api/session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+      signal: this.signal(),
+    });
+    if (!response.ok) {
+      throw new Error(`Traccar session failed: ${response.status}`);
+    }
+    const cookie = response.headers.get('set-cookie');
+    if (!cookie) throw new Error('Traccar did not return a session cookie');
+    return cookie;
   }
 }

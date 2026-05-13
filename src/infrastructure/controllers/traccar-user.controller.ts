@@ -50,11 +50,10 @@ export class TraccarUserController {
     const traccarPassword = randomBytes(16).toString('hex');
     const traccarUser = await this.traccarUserService.create({
       ...dto,
-      administrator: true,
       password: traccarPassword,
     } as any);
     const firebaseUid = (req['user'] as { id: string }).id;
-    await this.firestoreUserService.upsert(firebaseUid, {
+    await this.firestoreUserService.update(firebaseUid, {
       traccarUserId: traccarUser.getId(),
       traccarPassword,
     });
