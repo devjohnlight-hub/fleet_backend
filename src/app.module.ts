@@ -40,8 +40,10 @@ import { APP_GUARD } from '@nestjs/core';
         ],
         Storage: new ThrottlerStorageRedisService(
           new Redis({
-            host: configService.getOrThrow<string>('REDIS_HOST', 'localhost'),
-            port: configService.getOrThrow<number>('REDIS_PORT', 6379),
+            host: configService.get<string>('REDIS_HOST', 'localhost'),
+            port: configService.get<number>('REDIS_PORT', 6379),
+            lazyConnect: true,
+            retryStrategy: (times) => Math.min(times * 500, 10_000),
           }),
         ),
       }),
