@@ -47,6 +47,10 @@ export class UpdateFirestoreVehicleDto {
   vin?: string;
 
   @IsOptional()
+  @IsInt()
+  deviceId?: number;
+
+  @IsOptional()
   @IsString()
-  deviceId?: string;
+  uniqueId?: string;
 }

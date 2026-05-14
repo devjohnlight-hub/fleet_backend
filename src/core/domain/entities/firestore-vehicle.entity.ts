@@ -26,7 +26,8 @@ export class FirestoreVehicle {
     private readonly photoUrl: string | null,
     private readonly vin: string | null,
     private readonly createdAt: string | null,
-    private readonly deviceId: string | null,
+    private readonly deviceId: number | null,
+    private readonly uniqueId: string | null,
   ) {}
 
   getId(): string {
@@ -81,7 +82,11 @@ export class FirestoreVehicle {
     return this.createdAt;
   }
 
-  getDeviceId(): string | null {
+  getDeviceId(): number | null {
     return this.deviceId;
+  }
+
+  getUniqueId(): string | null {
+    return this.uniqueId;
   }
 }

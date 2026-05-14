@@ -21,7 +21,8 @@ interface VehicleRaw {
   photoUrl: string | null;
   vin: string | null;
   createdAt: string | null;
-  deviceId: string | null;
+  deviceId: number | null;
+  uniqueId: string | null;
 }
 
 export class FirestoreVehicleService {
@@ -91,6 +92,7 @@ export class FirestoreVehicleService {
       raw.vin ?? null,
       raw.createdAt ?? null,
       raw.deviceId ?? null,
+      raw.uniqueId ?? null,
     );
   }
 }

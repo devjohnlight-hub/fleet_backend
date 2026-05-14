@@ -70,7 +70,8 @@ export class TraccarDeviceController {
     await Promise.all([
       this.traccarHttpClient.linkDeviceToUser(traccarUserId, device.getId()),
       this.firestoreVehicleService.update(vehiculeId, {
-        deviceId: device.getUniqueId(),
+        deviceId: device.getId(),
+        uniqueId: device.getUniqueId(),
       }),
     ]);
     return device;
