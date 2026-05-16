@@ -41,6 +41,15 @@ export class FirestoreVehicleService {
     return raw ? this.toDomain(raw) : null;
   }
 
+  async findByDeviceId(deviceId: number): Promise<FirestoreVehicle | null> {
+    const raws = await this.firestoreService.findWhere<VehicleRaw>(
+      COLLECTION,
+      'deviceId',
+      deviceId,
+    );
+    return raws.length > 0 ? this.toDomain(raws[0]) : null;
+  }
+
   async findByOwnerId(ownerId: string): Promise<FirestoreVehicle[]> {
     const raws = await this.firestoreService.findWhere<VehicleRaw>(
       COLLECTION,

@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -16,7 +14,10 @@ import {
 import { Request } from 'express';
 import { TraccarDeviceService } from '../../core/application/services/traccar-device.service';
 import { FirestoreVehicleService } from '../../core/application/services/firestore-vehicle.service';
-import { TraccarCredentials, TraccarHttpClient } from '../traccar/traccar-http.client';
+import {
+  TraccarCredentials,
+  TraccarHttpClient,
+} from '../traccar/traccar-http.client';
 import { CreateTraccarDeviceDto } from '../../core/application/dtos/create-traccar-device.dto';
 import { UpdateTraccarDeviceDto } from '../../core/application/dtos/update-traccar-device.dto';
 import { FirebaseAuthGuard } from '../guards/firebase-auth.guard';
@@ -64,7 +65,8 @@ export class TraccarDeviceController {
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateTraccarDeviceDto) {
     const { vehiculeId, ...deviceData } = dto;
-    const traccarUserId = (req['user'] as { traccarUserId: number }).traccarUserId;
+    const traccarUserId = (req['user'] as { traccarUserId: number })
+      .traccarUserId;
 
     const device = await this.traccarDeviceService.create(deviceData);
     await Promise.all([
@@ -78,17 +80,41 @@ export class TraccarDeviceController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTraccarDeviceDto,
   ) {
-    return this.traccarDeviceService.update(id, dto as any, this.creds(req));
+    const device = await this.traccarDeviceService.update(
+      id,
+      dto,
+      this.creds(req),
+    );
+
+    if (dto.uniqueId !== undefined) {
+      const vehicle = await this.firestoreVehicleService.findByDeviceId(id);
+      if (vehicle) {
+        await this.firestoreVehicleService.update(vehicle.getId(), {
+          uniqueId: dto.uniqueId,
+        });
+      }
+    }
+
+    return device;
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
-    return this.traccarDeviceService.delete(id, this.creds(req));
+  async delete(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    await this.traccarDeviceService.delete(id, this.creds(req));
+
+    const vehicle = await this.firestoreVehicleService.findByDeviceId(id);
+    if (vehicle) {
+      await this.firestoreVehicleService.update(vehicle.getId(), {
+        deviceId: null,
+        uniqueId: null,
+      });
+    }
+
+    return { message: `Device ${id} supprimé avec succès.` };
   }
 }
