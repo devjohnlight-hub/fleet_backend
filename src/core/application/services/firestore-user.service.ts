@@ -40,16 +40,12 @@ export class FirestoreUserService {
     email: string,
     password: string,
   ): Promise<{ token: string; expiresIn: string }> {
-    console.log(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this.apiKey}`,
-    );
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this.apiKey}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, returnSecureToken: true }),
     });
-    console.log(response);
 
     if (!response.ok) {
       throw new UnauthorizedException('Email ou mot de passe incorrect');

@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import WebSocket from 'ws';
+import { WebSocket, RawData } from 'ws';
 import { TraccarHttpClient } from './traccar-http.client';
 
 export interface TraccarEvent {
@@ -24,6 +24,7 @@ export class TraccarWebsocketService implements OnModuleDestroy {
     this.disconnect(firebaseUid);
 
     const cookie = await this.traccarClient.getSessionCookie(email, password);
+    console.log('cookie', cookie);
     const wsUrl = this.traccarClient.baseUrl
       .replace('http://', 'ws://')
       .replace('https://', 'wss://');
@@ -36,12 +37,14 @@ export class TraccarWebsocketService implements OnModuleDestroy {
       this.logger.log(`Traccar WS connected for user ${firebaseUid}`);
     });
 
-    ws.on('message', (data: WebSocket.RawData) => {
+    ws.on('message', (data: RawData) => {
       try {
         const event = JSON.parse(data.toString()) as TraccarEvent;
         onEvent(event);
       } catch {
-        this.logger.warn(`Failed to parse Traccar WS message for ${firebaseUid}`);
+        this.logger.warn(
+          `Failed to parse Traccar WS message for ${firebaseUid}`,
+        );
       }
     });
 
@@ -51,7 +54,9 @@ export class TraccarWebsocketService implements OnModuleDestroy {
     });
 
     ws.on('error', (err) => {
-      this.logger.error(`Traccar WS error for user ${firebaseUid}: ${err.message}`);
+      this.logger.error(
+        `Traccar WS error for user ${firebaseUid}: ${err.message}`,
+      );
       this.connections.delete(firebaseUid);
     });
 

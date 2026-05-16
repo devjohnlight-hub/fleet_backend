@@ -44,6 +44,7 @@ export class FleetGateway implements OnGatewayDisconnect {
     }
 
     const user = await this.firestoreUserService.findById(firebaseUid);
+    console.log('user', user);
     if (!user || !user.getTraccarPassword()) {
       client.emit('error', 'Aucun compte Traccar associé');
       client.disconnect();
@@ -51,6 +52,7 @@ export class FleetGateway implements OnGatewayDisconnect {
     }
 
     this.userSockets.set(firebaseUid, client.id);
+    console.log('this.userSockets', this.userSockets);
 
     await this.traccarWsService.connect(
       firebaseUid,
