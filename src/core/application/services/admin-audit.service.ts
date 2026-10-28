@@ -40,6 +40,27 @@ export class AdminAuditService {
     return ref.id;
   }
 
+  // Exécute une mutation et la consigne, en succès comme en échec
+  async record<T>(
+    actor: StaffUser,
+    entry: Omit<AdminAuditEntry, 'result' | 'after' | 'error'>,
+    operation: () => Promise<{ result: T; after: Record<string, unknown> | null }>,
+  ): Promise<T> {
+    let outcome: { result: T; after: Record<string, unknown> | null };
+    try {
+      outcome = await operation();
+    } catch (err) {
+      await this.log(actor, {
+        ...entry,
+        result: 'failure',
+        error: err instanceof Error ? err.message : 'Erreur inconnue',
+      });
+      throw err;
+    }
+    await this.log(actor, { ...entry, result: 'success', after: outcome.after });
+    return outcome.result;
+  }
+
   private redact(value: unknown): unknown {
     if (Array.isArray(value)) return value.map((v) => this.redact(v));
     if (value === null || typeof value !== 'object') return value ?? null;

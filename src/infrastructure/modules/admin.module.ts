@@ -1,20 +1,31 @@
 import { Module } from '@nestjs/common';
 import { AdminHealthController } from '../controllers/admin-health.controller';
 import { AdminDeviceController } from '../controllers/admin-device.controller';
+import { AdminClientController } from '../controllers/admin-client.controller';
+import { AdminSubscriptionController } from '../controllers/admin-subscription.controller';
 import { AdminHealthService } from '../../core/application/services/admin-health.service';
 import { AdminDeviceService } from '../../core/application/services/admin-device.service';
+import { AdminClientService } from '../../core/application/services/admin-client.service';
+import { AdminSubscriptionService } from '../../core/application/services/admin-subscription.service';
 import { TraccarDeviceService } from '../../core/application/services/traccar-device.service';
 import { TraccarPositionService } from '../../core/application/services/traccar-position.service';
 import { AdminAuditService } from '../../core/application/services/admin-audit.service';
 import { StaffAuthGuard } from '../guards/staff-auth.guard';
+import { IdempotencyInterceptor } from '../interceptors/idempotency.interceptor';
 import { TraccarHttpClient } from '../traccar/traccar-http.client';
 import { FirestoreService } from '../firebase/firestore.service';
 import { RedisService } from '../redis/redis.service';
 
 @Module({
-  controllers: [AdminHealthController, AdminDeviceController],
+  controllers: [
+    AdminHealthController,
+    AdminDeviceController,
+    AdminClientController,
+    AdminSubscriptionController,
+  ],
   providers: [
     StaffAuthGuard,
+    IdempotencyInterceptor,
     TraccarHttpClient,
     {
       provide: AdminAuditService,
@@ -36,13 +47,30 @@ import { RedisService } from '../redis/redis.service';
       useFactory: (
         firestoreService: FirestoreService,
         traccarClient: TraccarHttpClient,
+        auditService: AdminAuditService,
       ) =>
         new AdminDeviceService(
           firestoreService,
           new TraccarDeviceService(traccarClient),
           new TraccarPositionService(traccarClient),
+          traccarClient,
+          auditService,
         ),
-      inject: [FirestoreService, TraccarHttpClient],
+      inject: [FirestoreService, TraccarHttpClient, AdminAuditService],
+    },
+    {
+      provide: AdminClientService,
+      useFactory: (auditService: AdminAuditService) =>
+        new AdminClientService(auditService),
+      inject: [AdminAuditService],
+    },
+    {
+      provide: AdminSubscriptionService,
+      useFactory: (
+        firestoreService: FirestoreService,
+        auditService: AdminAuditService,
+      ) => new AdminSubscriptionService(firestoreService, auditService),
+      inject: [FirestoreService, AdminAuditService],
     },
   ],
 })

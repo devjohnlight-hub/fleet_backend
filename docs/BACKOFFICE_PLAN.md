@@ -63,13 +63,16 @@ Filtres supplémentaires : `neverSeen`, `disabled`, `unlinked` (booléens). Inco
 - [ ] `GET /admin/v1/devices/:deviceId/positions?from=&to=` : fenêtre bornée (ex. ≤ 7 jours, sinon 400), via Traccar `/api/positions?deviceId=&from=&to=`.
 - [ ] Ne jamais renvoyer `traccarPassword`, `fcmToken`, tokens.
 
-### Étape 4 — Phase 2 : mutations (avec `reason` obligatoire + audit avant/après)
-- [ ] `PATCH /admin/v1/clients/:uid/access` `{ disabled, reason }` — `support`, `super_admin`. Firebase `updateUser({disabled})` + `revokeRefreshTokens` si suspension.
-- [ ] `POST /admin/v1/subscriptions/:uid/adjustments` `{ planId?, status?, endDate?, reason }` — `billing`, `super_admin`. Valider cohérence plan/permissions (lire `plans/{planId}`).
-- [ ] `PATCH /admin/v1/devices/:deviceId` — `support`, `super_admin`. Synchroniser les champs véhicule Firestore comme le fait déjà `traccar-device.controller.ts`.
-- [ ] `POST /admin/v1/devices/:deviceId/disable` `{ reason }` — `support`, `super_admin`.
-- [ ] `POST /admin/v1/devices/:deviceId/link` `{ vehicleId, ownerId, reason }` — `support`, `super_admin` (utiliser `linkDeviceToUser`).
-- [ ] Support `Idempotency-Key` sur les mutations relançables (stockage Redis).
+### 🚧 Étape 4 — Phase 2 : mutations (avec `reason` obligatoire + audit avant/après)
+Code écrit le 2026-10-28, build OK, routes protégées (401 sans token). **Tests avec token staff à faire.**
+
+- [x] `PATCH /admin/v1/clients/:uid/access` `{ disabled, reason }` — `support`, `super_admin`. `updateUser({disabled})` + `revokeRefreshTokens` si suspension. Refus : son propre compte (400), compte staff si l'appelant n'est pas `super_admin` (403).
+- [x] `POST /admin/v1/subscriptions/:uid/adjustments` `{ planId?, status?, endDate?, reason }` — `billing`, `super_admin`. `planId` → copie `plans/{planId}.permissions`. Statuts acceptés : `trial`, `active`, `expired`, `cancelled`. Cohérence : `endDate > startDate` ; `active`/`trial` ⇒ `endDate` future ; `expired` ⇒ `endDate` passée. `trialEndDate` non modifié.
+- [x] `PATCH /admin/v1/devices/:deviceId` `{ name?, uniqueId?, groupId?, phone?, model?, contact?, category?, reason }` — `support`, `super_admin`. PUT Traccar avec l'objet complet fusionné ; `uniqueId` resynchronisé sur les véhicules Firestore.
+- [x] `POST /admin/v1/devices/:deviceId/disable` et `/enable` `{ reason }` — `support`, `super_admin`.
+- [x] `POST /admin/v1/devices/:deviceId/link` `{ vehicleId, ownerId, reason }` — `support`, `super_admin`. Vérifie propriétaire du véhicule, compte Traccar du client ; 409 si véhicule ou device déjà rattaché ailleurs (jamais de déplacement implicite) ; ajoute la permission Traccar si absente.
+- [x] `Idempotency-Key` (Redis, 24 h, par staff + méthode + chemin) : rejoue la réponse, 409 si en cours, 422 si corps différent ; clé libérée en cas d'échec.
+- Audit via `AdminAuditService.record()` (succès et échec). No-op (état déjà atteint) → `changed: false`, pas d'audit.
 
 ### Étape 5 — Gestion staff et utilitaires
 - [ ] `GET/POST/PATCH /admin/v1/staff` — `super_admin` uniquement (remplace le script à terme).

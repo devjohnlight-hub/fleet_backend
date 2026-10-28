@@ -1,18 +1,26 @@
 import {
   BadGatewayException,
   BadRequestException,
+  ConflictException,
   NotFoundException,
 } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { FirestoreService } from '../../../infrastructure/firebase/firestore.service';
+import { TraccarHttpClient } from '../../../infrastructure/traccar/traccar-http.client';
 import { TraccarDevice } from '../../domain/entities/traccar-device.entity';
 import { TraccarPosition } from '../../domain/entities/traccar-position.entity';
+import { StaffUser } from '../../domain/entities/staff-role';
 import { TraccarDeviceService } from './traccar-device.service';
 import { TraccarPositionService } from './traccar-position.service';
+import { AdminAuditService } from './admin-audit.service';
 import {
   AdminDevicePositionsQueryDto,
   AdminDevicesQueryDto,
 } from '../dtos/admin-devices-query.dto';
+import {
+  AdminLinkDeviceDto,
+  AdminUpdateDeviceDto,
+} from '../dtos/admin-mutations.dto';
 
 const DEFAULT_LIMIT = 50;
 const MAX_POSITIONS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
@@ -69,6 +77,30 @@ export interface AdminDeviceList {
   orphanVehicles?: { vehicle: VehicleSummary; reason: OrphanVehicleReason }[];
 }
 
+export interface DeviceEditableFields extends Record<string, unknown> {
+  name: string;
+  uniqueId: string;
+  disabled: boolean;
+  groupId: number | null;
+  phone: string | null;
+  model: string | null;
+  contact: string | null;
+  category: string | null;
+}
+
+export interface DeviceMutationResult {
+  deviceId: number;
+  changed: boolean;
+  device: DeviceEditableFields;
+}
+
+export interface DeviceLinkResult {
+  deviceId: number;
+  vehicleId: string;
+  ownerId: string;
+  changed: boolean;
+}
+
 export interface AdminDeviceDetail extends AdminDeviceItem {
   phone: string | null;
   contact: string | null;
@@ -82,6 +114,8 @@ export class AdminDeviceService {
     private readonly firestoreService: FirestoreService,
     private readonly traccarDeviceService: TraccarDeviceService,
     private readonly traccarPositionService: TraccarPositionService,
+    private readonly traccarClient: TraccarHttpClient,
+    private readonly auditService: AdminAuditService,
   ) {}
 
   async list(query: AdminDevicesQueryDto): Promise<AdminDeviceList> {
@@ -211,6 +245,176 @@ export class AdminDeviceService {
         to: new Date(to).toISOString(),
       }),
     );
+  }
+
+  async update(
+    staff: StaffUser,
+    deviceId: number,
+    dto: AdminUpdateDeviceDto,
+  ): Promise<DeviceMutationResult> {
+    const { reason, ...changes } = dto;
+    if (Object.keys(changes).length === 0) {
+      throw new BadRequestException('Aucun champ à modifier');
+    }
+
+    const device = await this.getDeviceOrThrow(deviceId);
+    const before = this.editableFields(device);
+
+    return this.auditService.record(
+      staff,
+      { action: 'device.update', targetType: 'device', targetId: String(deviceId), reason, before },
+      async () => {
+        const updated = await this.putDevice(device, changes);
+        if (updated.getUniqueId() !== device.getUniqueId()) {
+          await this.syncVehicleUniqueId(deviceId, updated.getUniqueId());
+        }
+        const after = this.editableFields(updated);
+        return { result: { deviceId, changed: true, device: after }, after };
+      },
+    );
+  }
+
+  async setDisabled(
+    staff: StaffUser,
+    deviceId: number,
+    disabled: boolean,
+    reason: string,
+  ): Promise<DeviceMutationResult> {
+    const device = await this.getDeviceOrThrow(deviceId);
+    const before = this.editableFields(device);
+    if (device.isDisabled() === disabled) {
+      return { deviceId, changed: false, device: before };
+    }
+
+    return this.auditService.record(
+      staff,
+      {
+        action: disabled ? 'device.disable' : 'device.enable',
+        targetType: 'device',
+        targetId: String(deviceId),
+        reason,
+        before: { disabled: device.isDisabled() },
+      },
+      async () => {
+        const after = this.editableFields(await this.putDevice(device, { disabled }));
+        return {
+          result: { deviceId, changed: true, device: after },
+          after: { disabled: after.disabled },
+        };
+      },
+    );
+  }
+
+  async link(
+    staff: StaffUser,
+    deviceId: number,
+    dto: AdminLinkDeviceDto,
+  ): Promise<DeviceLinkResult> {
+    const device = await this.getDeviceOrThrow(deviceId);
+
+    const vehicleRef = this.firestoreService.collection('vehicles').doc(dto.vehicleId);
+    const vehicle = await vehicleRef.get();
+    if (!vehicle.exists) throw new NotFoundException('Véhicule introuvable');
+    if (vehicle.get('ownerId') !== dto.ownerId) {
+      throw new BadRequestException('Le véhicule n\'appartient pas à ce client');
+    }
+
+    const client = await this.findClient(dto.ownerId);
+    if (!client) throw new NotFoundException('Client introuvable');
+    if (client.traccarUserId === null) {
+      throw new BadRequestException('Le client n\'a pas de compte Traccar');
+    }
+
+    // On ne déplace jamais implicitement un rattachement existant
+    const vehicleDeviceId = (vehicle.get('deviceId') as number | null | undefined) ?? null;
+    if (vehicleDeviceId !== null && vehicleDeviceId !== deviceId) {
+      throw new ConflictException(`Véhicule déjà rattaché au device ${vehicleDeviceId}`);
+    }
+    const otherVehicles = (await this.findVehiclesByDeviceId(deviceId)).filter(
+      (v) => v.id !== dto.vehicleId,
+    );
+    if (otherVehicles.length > 0) {
+      throw new ConflictException(`Device déjà rattaché au véhicule ${otherVehicles[0].id}`);
+    }
+
+    const ownerDevices = await this.traccar(() =>
+      this.traccarDeviceService.findAll({ userId: client.traccarUserId! }),
+    );
+    const hasPermission = ownerDevices.some((d) => d.getId() === deviceId);
+    const before = {
+      vehicleDeviceId,
+      vehicleUniqueId: (vehicle.get('uniqueId') as string | null | undefined) ?? null,
+      ownerHasTraccarPermission: hasPermission,
+    };
+
+    const result = { deviceId, vehicleId: dto.vehicleId, ownerId: dto.ownerId };
+    if (hasPermission && vehicleDeviceId === deviceId && before.vehicleUniqueId === device.getUniqueId()) {
+      return { ...result, changed: false };
+    }
+
+    return this.auditService.record(
+      staff,
+      { action: 'device.link', targetType: 'device', targetId: String(deviceId), reason: dto.reason, before },
+      async () => {
+        if (!hasPermission) {
+          await this.traccar(() =>
+            this.traccarClient.linkDeviceToUser(client.traccarUserId!, deviceId),
+          );
+        }
+        await vehicleRef.update({ deviceId, uniqueId: device.getUniqueId() });
+        return {
+          result: { ...result, changed: true },
+          after: {
+            vehicleDeviceId: deviceId,
+            vehicleUniqueId: device.getUniqueId(),
+            ownerHasTraccarPermission: true,
+          },
+        };
+      },
+    );
+  }
+
+  // Traccar remplace l'objet entier sur PUT : on renvoie toujours le device complet
+  private async putDevice(
+    device: TraccarDevice,
+    changes: Partial<DeviceEditableFields>,
+  ): Promise<TraccarDevice> {
+    return this.traccar(() =>
+      this.traccarDeviceService.update(device.getId(), {
+        name: device.getName(),
+        uniqueId: device.getUniqueId(),
+        disabled: device.isDisabled(),
+        groupId: device.getGroupId() ?? 0,
+        phone: device.getPhone(),
+        model: device.getModel(),
+        contact: device.getContact(),
+        category: device.getCategory(),
+        attributes: device.getAttributes(),
+        ...changes,
+      }),
+    );
+  }
+
+  private async syncVehicleUniqueId(deviceId: number, uniqueId: string): Promise<void> {
+    const vehicles = await this.findVehiclesByDeviceId(deviceId);
+    await Promise.all(
+      vehicles.map((v) =>
+        this.firestoreService.collection('vehicles').doc(v.id).update({ uniqueId }),
+      ),
+    );
+  }
+
+  private editableFields(device: TraccarDevice): DeviceEditableFields {
+    return {
+      name: device.getName(),
+      uniqueId: device.getUniqueId(),
+      disabled: device.isDisabled(),
+      groupId: device.getGroupId(),
+      phone: device.getPhone(),
+      model: device.getModel(),
+      contact: device.getContact(),
+      category: device.getCategory(),
+    };
   }
 
   private toItem(
