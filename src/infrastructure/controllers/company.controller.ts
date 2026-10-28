@@ -6,11 +6,18 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CompanyService } from '../../core/application/services/company.service';
 import { CreateCompanyDto } from '../../core/application/dtos/create-company.dto';
 import { UpdateCompanyDto } from '../../core/application/dtos/update-company.dto';
+import { StaffRole } from '../../core/domain/entities/staff-role';
+import { StaffAuthGuard } from '../guards/staff-auth.guard';
+import { StaffRoles } from '../decorators/staff-roles.decorator';
 
+// Parcours fleet owner (Prisma) non utilisé par le mobile : réservé au super_admin
+@UseGuards(StaffAuthGuard)
+@StaffRoles(StaffRole.SUPER_ADMIN)
 @Controller('companies')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}

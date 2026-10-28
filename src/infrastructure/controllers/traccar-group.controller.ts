@@ -10,11 +10,18 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TraccarGroupService } from '../../core/application/services/traccar-group.service';
 import { CreateTraccarGroupDto } from '../../core/application/dtos/create-traccar-group.dto';
 import { UpdateTraccarGroupDto } from '../../core/application/dtos/update-traccar-group.dto';
+import { StaffRole } from '../../core/domain/entities/staff-role';
+import { StaffAuthGuard } from '../guards/staff-auth.guard';
+import { StaffRoles } from '../decorators/staff-roles.decorator';
 
+// Non utilisé par le mobile : identifiants Traccar admin, réservé au super_admin
+@UseGuards(StaffAuthGuard)
+@StaffRoles(StaffRole.SUPER_ADMIN)
 @Controller('traccar/groups')
 export class TraccarGroupController {
   constructor(private readonly traccarGroupService: TraccarGroupService) {}
