@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  Tous les groupes Traccar.
+method: GET
+url: "{{baseUrl}}/traccar/groups"
+order: 1000
+queryParams:
+  - key: "userId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "limit"
+    value: "50"
+    description: "Pagination"
+    disabled: true
+  - key: "offset"
+    value: "0"
+    description: "Pagination"
+    disabled: true
+  - key: "keyword"
+    value: ""
+    description: "Recherche"
+    disabled: true
+examples: "./.resources/Lister les groupes.resources/examples"

@@ -1,0 +1,18 @@
+$kind: http-request
+description: |-
+  `name` et `contact` obligatoires.
+method: POST
+url: "{{baseUrl}}/companies"
+order: 1000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Transports Koné",
+      "contact": "+2250700000000",
+      "address": "Abidjan, Cocody",
+      "email": "contact@example.com"
+    }

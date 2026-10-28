@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Date incohérente"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/subscriptions/:uid/adjustments"
+  method: POST
+response:
+  statusCode: 400
+  statusText: "Bad Request"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Un abonnement \"active\" ne peut pas avoir une date de fin passée",
+        "data": null
+      }

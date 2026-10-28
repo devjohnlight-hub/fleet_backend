@@ -1,0 +1,17 @@
+$kind: http-request
+description: |-
+  Crée le compte Traccar du client connecté, génère son mot de passe Traccar et l'enregistre dans `users/{uid}` (`traccarUserId`, `traccarPassword`). À appeler une fois après l'inscription.
+method: POST
+url: "{{baseUrl}}/traccar/users"
+order: 1000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Awa Koné",
+      "email": "client@example.com",
+      "phone": "+2250700000000"
+    }

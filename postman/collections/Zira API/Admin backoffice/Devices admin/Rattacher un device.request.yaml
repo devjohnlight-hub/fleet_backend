@@ -1,0 +1,25 @@
+$kind: http-request
+description: |-
+  `support`, `super_admin`. Le véhicule doit appartenir à `ownerId`, qui doit avoir un compte Traccar. 409 si le véhicule ou le device est déjà rattaché ailleurs (jamais de déplacement implicite). Ajoute la permission Traccar si absente.
+method: POST
+url: "{{baseUrl}}/admin/v1/devices/:deviceId/link"
+order: 7000
+pathVariables:
+  - key: "deviceId"
+    value: "42"
+    description: "ID Traccar"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+  - key: "Idempotency-Key"
+    value: "{{$guid}}"
+    description: "Optionnel. Rejouer avec la même clé renvoie la réponse déjà calculée (24 h). 409 si en cours, 422 si le corps diffère."
+body:
+  type: json
+  content: |-
+    {
+      "vehicleId": "veh_abc",
+      "ownerId": "uid_client_123",
+      "reason": "Demande du client par téléphone (ticket #1234)"
+    }
+examples: "./.resources/Rattacher un device.resources/examples"

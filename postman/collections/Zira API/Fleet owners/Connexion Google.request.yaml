@@ -1,0 +1,8 @@
+$kind: http-request
+description: |-
+  Redirige vers Google OAuth. À ouvrir dans un navigateur.
+method: GET
+url: "{{baseUrl}}/fleet-owners/auth/google"
+order: 4000
+auth:
+  type: noauth

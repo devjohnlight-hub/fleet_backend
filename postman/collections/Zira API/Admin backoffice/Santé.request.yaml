@@ -1,0 +1,7 @@
+$kind: http-request
+description: |-
+  Tout rôle staff. Vérifie Firestore, Redis et Traccar avec leur latence. `status: degraded` si une dépendance est `down`.
+method: GET
+url: "{{baseUrl}}/admin/v1/health"
+order: 2000
+examples: "./.resources/Santé.resources/examples"

@@ -1,0 +1,24 @@
+$kind: http-example
+name: "Suspendu"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/clients/:uid/access"
+  method: PATCH
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "uid": "uid_client_123",
+          "disabled": true,
+          "changed": true
+        }
+      }

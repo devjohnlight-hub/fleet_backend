@@ -1,0 +1,9 @@
+$kind: collection
+description: |-
+  Entreprises (base Prisma). **Réservé au staff `super_admin`** (token staff).
+order: 6000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: "{{staffIdToken}}"

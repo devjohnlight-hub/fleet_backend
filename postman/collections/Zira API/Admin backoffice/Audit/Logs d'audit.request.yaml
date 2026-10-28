@@ -1,0 +1,31 @@
+$kind: http-request
+description: |-
+  `super_admin`, `support`, `billing` (pas `viewer`). Plus récents d'abord. Les filtres combinés peuvent demander un index composite Firestore : l'erreur renvoie alors le lien de création.
+method: GET
+url: "{{baseUrl}}/admin/v1/audit-logs?limit=50"
+order: 1000
+queryParams:
+  - key: "limit"
+    value: "50"
+    description: "1 à 100"
+  - key: "cursor"
+    value: ""
+    description: "nextCursor de la page précédente"
+    disabled: true
+  - key: "targetType"
+    value: "device"
+    description: "device, client, subscription, staff"
+    disabled: true
+  - key: "targetId"
+    value: "42"
+    description: "ID de la cible"
+    disabled: true
+  - key: "actorUid"
+    value: ""
+    description: "UID du staff"
+    disabled: true
+  - key: "action"
+    value: "device.disable"
+    description: "Ex. client.suspend, subscription.adjust"
+    disabled: true
+examples: "./.resources/Logs d'audit.resources/examples"

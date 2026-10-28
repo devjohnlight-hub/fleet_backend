@@ -1,0 +1,33 @@
+$kind: http-example
+name: "Réactivé"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId/enable"
+  method: POST
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "deviceId": 42,
+          "changed": true,
+          "device": {
+            "name": "Tracker Corolla",
+            "uniqueId": "864893030000000",
+            "disabled": false,
+            "groupId": 0,
+            "phone": null,
+            "model": "GT06",
+            "contact": null,
+            "category": "car"
+          }
+        }
+      }

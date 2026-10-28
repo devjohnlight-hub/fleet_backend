@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Déjà staff"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/staff"
+  method: POST
+response:
+  statusCode: 409
+  statusText: "Conflict"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Ce compte est déjà staff (support) : utiliser PATCH /admin/v1/staff/:uid",
+        "data": null
+      }

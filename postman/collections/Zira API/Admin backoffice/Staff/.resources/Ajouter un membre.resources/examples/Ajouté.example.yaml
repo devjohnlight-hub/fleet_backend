@@ -1,0 +1,28 @@
+$kind: http-example
+name: "Ajouté"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/staff"
+  method: POST
+response:
+  statusCode: 201
+  statusText: "Created"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "uid": "uid_staff_1",
+          "email": "support@zira.ci",
+          "displayName": "Support Zira",
+          "role": "support",
+          "disabled": false,
+          "mfaEnrolled": true,
+          "lastSignInTime": "Tue, 28 Oct 2026 08:00:00 GMT"
+        }
+      }

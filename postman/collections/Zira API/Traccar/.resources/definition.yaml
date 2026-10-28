@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Façade vers le serveur GPS Traccar. Sauf mention contraire : Les requêtes partent avec le compte Traccar du client connecté (identifiants lus dans `users/{uid}`). 404 si le client n'a pas de compte Traccar.
+order: 4000

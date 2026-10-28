@@ -1,0 +1,12 @@
+$kind: http-request
+description: |-
+  Session courante, ou à partir d'un `token` Traccar.
+method: GET
+url: "{{baseUrl}}/traccar/session"
+order: 2000
+queryParams:
+  - key: "token"
+    value: ""
+    description: "Token de session Traccar (optionnel)"
+    disabled: true
+examples: "./.resources/Lire la session.resources/examples"

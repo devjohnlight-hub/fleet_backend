@@ -1,0 +1,7 @@
+$kind: http-request
+description: |-
+  Sans effet côté serveur (le JWT reste valide jusqu'à expiration).
+method: POST
+url: "{{baseUrl}}/fleet-owners/logout"
+order: 3000
+examples: "./.resources/Déconnexion fleet owner.resources/examples"

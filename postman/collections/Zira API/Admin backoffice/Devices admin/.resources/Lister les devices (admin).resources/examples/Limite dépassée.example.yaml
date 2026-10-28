@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Limite dépassée"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/devices?limit=50"
+  method: GET
+response:
+  statusCode: 400
+  statusText: "Bad Request"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "limit must not be greater than 100",
+        "data": null
+      }

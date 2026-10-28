@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  `support`, `super_admin`. `disabled: true` désactive le compte Firebase et révoque ses sessions. Interdit sur son propre compte ; un compte staff ne peut être modifié que par un `super_admin`.
+method: PATCH
+url: "{{baseUrl}}/admin/v1/clients/:uid/access"
+order: 1000
+pathVariables:
+  - key: "uid"
+    value: "uid_client_123"
+    description: "UID Firebase"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+  - key: "Idempotency-Key"
+    value: "{{$guid}}"
+    description: "Optionnel. Rejouer avec la même clé renvoie la réponse déjà calculée (24 h). 409 si en cours, 422 si le corps diffère."
+body:
+  type: json
+  content: |-
+    {
+      "disabled": true,
+      "reason": "Demande du client par téléphone (ticket #1234)"
+    }
+examples: "./.resources/Suspendre ou réactiver un client.resources/examples"

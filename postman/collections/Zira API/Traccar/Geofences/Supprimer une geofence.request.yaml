@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Suppression définitive.
+method: DELETE
+url: "{{baseUrl}}/traccar/geofences/:id"
+order: 4000
+pathVariables:
+  - key: "id"
+    value: "5"
+    description: "ID Traccar"
+examples: "./.resources/Supprimer une geofence.resources/examples"

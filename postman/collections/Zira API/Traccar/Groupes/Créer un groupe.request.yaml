@@ -1,0 +1,15 @@
+$kind: http-request
+description: |-
+  `groupId` : groupe parent (optionnel).
+method: POST
+url: "{{baseUrl}}/traccar/groups"
+order: 2000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Flotte Abidjan"
+    }

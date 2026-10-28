@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Suppression définitive.
+method: DELETE
+url: "{{baseUrl}}/traccar/notifications/:id"
+order: 6000
+pathVariables:
+  - key: "id"
+    value: "8"
+    description: "ID Traccar"
+examples: "./.resources/Supprimer une notification.resources/examples"

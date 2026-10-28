@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Sans fichier"
+order: 2000
+request:
+  url: "{{baseUrl}}/files/upload?folder=fleet"
+  method: POST
+response:
+  statusCode: 400
+  statusText: "Bad Request"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Aucun fichier fourni",
+        "data": null
+      }

@@ -1,0 +1,20 @@
+$kind: collection
+description: |-
+  API du backoffice interne, sous `/admin/v1`. Toutes les routes exigent un **ID token Firebase d'un compte staff** (claim `staffRole`, révocation vérifiée).
+
+  | Rôle | Droits |
+  |---|---|
+  | `viewer` | Lectures uniquement |
+  | `support` | Lectures + clients, notes, devices |
+  | `billing` | Lectures + abonnements |
+  | `super_admin` | Tout, dont la gestion du staff |
+
+  **Mutations** : `reason` obligatoire (5 à 500 caractères), audit avant/après dans `admin_audit_logs`, header `Idempotency-Key` accepté. Si l'état demandé est déjà en place : `changed: false`, rien n'est audité.
+
+  Chaque réponse porte un header `X-Request-Id` (repris de la requête s'il est valide).
+order: 8000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: "{{staffIdToken}}"

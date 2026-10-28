@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Renvoie `data: null` si le véhicule n'existe pas.
+method: GET
+url: "{{baseUrl}}/vehicles/:id"
+order: 2000
+pathVariables:
+  - key: "id"
+    value: "veh_abc"
+    description: "ID Firestore"
+examples: "./.resources/Lire un véhicule.resources/examples"

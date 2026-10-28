@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Limité au compte connecté : 403 sur un autre `id`.
+method: GET
+url: "{{baseUrl}}/users/:id"
+order: 5000
+pathVariables:
+  - key: "id"
+    value: "uid_client_123"
+    description: "UID Firebase (doit être le vôtre)"
+examples: "./.resources/Lire un utilisateur.resources/examples"

@@ -1,0 +1,6 @@
+$kind: http-request
+description: |-
+  Types d'événements disponibles (`deviceOnline`, `geofenceEnter`…).
+method: GET
+url: "{{baseUrl}}/traccar/notifications/types"
+order: 2000

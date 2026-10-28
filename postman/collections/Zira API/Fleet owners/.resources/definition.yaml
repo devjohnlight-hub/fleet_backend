@@ -1,0 +1,9 @@
+$kind: collection
+description: |-
+  Parcours « fleet owner » (base Prisma, JWT propre au backend). Non utilisé par l'app mobile.
+order: 5000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: "{{fleetOwnerJwt}}"

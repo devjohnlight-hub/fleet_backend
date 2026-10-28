@@ -1,0 +1,13 @@
+$kind: http-example
+name: "Envoyée"
+order: 1000
+request:
+  url: "{{baseUrl}}/traccar/notifications/test/:notificator"
+  method: GET
+response:
+  statusCode: 204
+  statusText: "No Content"
+  headers: []
+  body:
+    type: text
+    content: ''

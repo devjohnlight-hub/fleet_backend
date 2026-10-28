@@ -1,0 +1,46 @@
+$kind: http-example
+name: "Ajusté"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/subscriptions/:uid/adjustments"
+  method: POST
+response:
+  statusCode: 201
+  statusText: "Created"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "uid": "uid_client_123",
+          "before": {
+            "planId": "starter",
+            "status": "trial",
+            "endDate": "2026-11-05T00:00:00.000Z",
+            "permissions": {
+              "vehicleLimit": 2,
+              "driverLimit": 2,
+              "canExport": false,
+              "canUseGps": true,
+              "maxUsers": 1
+            }
+          },
+          "after": {
+            "planId": "pro",
+            "status": "active",
+            "endDate": "2026-12-31T23:59:59.000Z",
+            "permissions": {
+              "vehicleLimit": 10,
+              "driverLimit": 10,
+              "canExport": true,
+              "canUseGps": true,
+              "maxUsers": 3
+            }
+          }
+        }
+      }

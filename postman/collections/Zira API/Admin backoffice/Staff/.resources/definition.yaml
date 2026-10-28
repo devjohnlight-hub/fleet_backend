@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Gestion des comptes staff. **`super_admin` uniquement.** Un changement de rôle révoque les sessions du compte. On ne peut pas modifier son propre rôle.
+order: 4000

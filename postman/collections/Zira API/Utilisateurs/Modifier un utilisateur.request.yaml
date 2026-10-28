@@ -1,0 +1,23 @@
+$kind: http-request
+description: |-
+  Limité au compte connecté. Champs acceptés : `email`, `name`, `phoneNumber`, `photoUrl`, `fcmToken`.
+
+  `role`, `userType` et `traccarUserId` sont refusés (400).
+method: PUT
+url: "{{baseUrl}}/users/:id"
+order: 6000
+pathVariables:
+  - key: "id"
+    value: "uid_client_123"
+    description: "UID Firebase (doit être le vôtre)"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Awa Koné",
+      "phoneNumber": "+2250700000001"
+    }
+examples: "./.resources/Modifier un utilisateur.resources/examples"

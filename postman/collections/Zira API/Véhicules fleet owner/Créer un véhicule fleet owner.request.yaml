@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Création.
+method: POST
+url: "{{baseUrl}}/vehicules"
+order: 1000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "fleetOwnerId": "1",
+      "type": "voiture",
+      "immatriculation": "AB-1234-CI",
+      "marque": "Toyota",
+      "modele": "Corolla",
+      "annee": 2021
+    }

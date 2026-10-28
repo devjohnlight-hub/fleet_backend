@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Actions sur les comptes clients.
+order: 2000

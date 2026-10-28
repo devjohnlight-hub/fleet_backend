@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Email déjà utilisé"
+order: 2000
+request:
+  url: "{{baseUrl}}/users/register"
+  method: POST
+response:
+  statusCode: 409
+  statusText: "Conflict"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Cette adresse email est déjà utilisée",
+        "data": null
+      }

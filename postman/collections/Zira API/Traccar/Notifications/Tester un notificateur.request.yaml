@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Envoie une notification de test.
+method: GET
+url: "{{baseUrl}}/traccar/notifications/test/:notificator"
+order: 3000
+pathVariables:
+  - key: "notificator"
+    value: "web"
+    description: "Notificateur Traccar (web, mail, firebase…)"
+examples: "./.resources/Tester un notificateur.resources/examples"

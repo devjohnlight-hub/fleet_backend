@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  Si `uniqueId` change, il est recopié sur le véhicule Firestore.
+
+  ⚠️ À vérifier : l'objet partiel est transmis tel quel à Traccar, qui remplace le device entier — les champs absents peuvent être effacés. Envoyez l'objet complet.
+method: PUT
+url: "{{baseUrl}}/traccar/devices/:id"
+order: 3000
+pathVariables:
+  - key: "id"
+    value: "42"
+    description: "ID Traccar"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Tracker Corolla",
+      "uniqueId": "864893030000000",
+      "model": "GT06"
+    }
+examples: "./.resources/Modifier un device.resources/examples"

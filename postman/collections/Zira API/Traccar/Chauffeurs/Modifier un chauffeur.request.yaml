@@ -1,0 +1,19 @@
+$kind: http-request
+description: |-
+  Mise à jour partielle.
+method: PUT
+url: "{{baseUrl}}/traccar/drivers/:id"
+order: 3000
+pathVariables:
+  - key: "id"
+    value: "3"
+    description: "ID Traccar"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Koffi Yao"
+    }

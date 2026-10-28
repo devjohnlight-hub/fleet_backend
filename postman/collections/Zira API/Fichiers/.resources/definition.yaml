@@ -1,0 +1,6 @@
+$kind: collection
+description: |-
+  Upload vers Cloudinary.
+
+  ⚠️ **Faille connue** : route sans authentification, `folder` libre, fichiers publics (`type: upload`). Correction en attente de vérification côté mobile.
+order: 3000

@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Comptes clients Firebase (`users/{uid}`). Les réponses ne contiennent jamais `traccarPassword` ni `fcmToken`.
+order: 1000

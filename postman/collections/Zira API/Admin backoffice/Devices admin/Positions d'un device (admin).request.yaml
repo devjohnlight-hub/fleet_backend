@@ -1,0 +1,18 @@
+$kind: http-request
+description: |-
+  Tout rôle staff. Fenêtre obligatoire, 7 jours maximum.
+method: GET
+url: "{{baseUrl}}/admin/v1/devices/:deviceId/positions?from=2026-10-27T00:00:00Z&to=2026-10-28T00:00:00Z"
+order: 3000
+pathVariables:
+  - key: "deviceId"
+    value: "42"
+    description: "ID Traccar"
+queryParams:
+  - key: "from"
+    value: "2026-10-27T00:00:00Z"
+    description: "Début ISO-8601 (obligatoire)"
+  - key: "to"
+    value: "2026-10-28T00:00:00Z"
+    description: "Fin ISO-8601 (obligatoire)"
+examples: "./.resources/Positions d'un device (admin).resources/examples"

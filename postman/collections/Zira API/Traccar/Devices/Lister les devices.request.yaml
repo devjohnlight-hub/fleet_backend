@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  Par défaut, les devices du compte Traccar connecté. Le mobile lit un device avec `?id=` (la réponse reste une liste).
+method: GET
+url: "{{baseUrl}}/traccar/devices"
+order: 1000
+queryParams:
+  - key: "id"
+    value: "42"
+    description: "ID Traccar du device"
+    disabled: true
+  - key: "uniqueId"
+    value: ""
+    description: "IMEI"
+    disabled: true
+  - key: "userId"
+    value: ""
+    description: "Défaut : le compte Traccar connecté"
+    disabled: true
+  - key: "all"
+    value: "false"
+    description: "Admin Traccar uniquement"
+    disabled: true
+examples: "./.resources/Lister les devices.resources/examples"

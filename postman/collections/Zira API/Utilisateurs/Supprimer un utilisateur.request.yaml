@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Supprime le profil Firestore uniquement (pas le compte Auth ni les données liées). Limité au compte connecté.
+method: DELETE
+url: "{{baseUrl}}/users/:id"
+order: 7000
+pathVariables:
+  - key: "id"
+    value: "uid_client_123"
+    description: "UID Firebase (doit être le vôtre)"
+examples: "./.resources/Supprimer un utilisateur.resources/examples"

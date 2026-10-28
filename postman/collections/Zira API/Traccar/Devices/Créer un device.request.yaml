@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Crée le device dans Traccar, le rattache au compte Traccar du client et écrit `deviceId` / `uniqueId` sur le véhicule Firestore `vehiculeId` (orthographe actuelle).
+method: POST
+url: "{{baseUrl}}/traccar/devices"
+order: 2000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Tracker Corolla",
+      "uniqueId": "864893030000000",
+      "vehiculeId": "veh_abc",
+      "model": "GT06",
+      "category": "car"
+    }
+examples: "./.resources/Créer un device.resources/examples"

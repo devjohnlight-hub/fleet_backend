@@ -1,0 +1,17 @@
+$kind: http-request
+description: |-
+  `area` au format WKT Traccar (`CIRCLE (lat lon, rayon_m)` ou `POLYGON ((...))`).
+method: POST
+url: "{{baseUrl}}/traccar/geofences"
+order: 2000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Dépôt Yopougon",
+      "area": "CIRCLE (5.3364 -4.0267, 200)",
+      "description": "Zone de stationnement"
+    }

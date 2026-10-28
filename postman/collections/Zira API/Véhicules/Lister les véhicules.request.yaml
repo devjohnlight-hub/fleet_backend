@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Tous les véhicules, ou ceux d'un propriétaire avec `ownerId`.
+method: GET
+url: "{{baseUrl}}/vehicles?ownerId=uid_client_123"
+order: 1000
+queryParams:
+  - key: "ownerId"
+    value: "uid_client_123"
+    description: "UID du propriétaire"
+examples: "./.resources/Lister les véhicules.resources/examples"

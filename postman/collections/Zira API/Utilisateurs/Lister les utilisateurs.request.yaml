@@ -1,0 +1,12 @@
+$kind: http-request
+description: |-
+  **Réservé au staff `super_admin`** (token staff). Les clients reçoivent 403.
+method: GET
+url: "{{baseUrl}}/users"
+order: 4000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: "{{staffIdToken}}"
+examples: "./.resources/Lister les utilisateurs.resources/examples"
