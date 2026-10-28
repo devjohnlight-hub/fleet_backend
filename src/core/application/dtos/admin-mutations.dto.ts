@@ -13,7 +13,12 @@ import {
 } from 'class-validator';
 import { StaffRole } from '../../domain/entities/staff-role';
 
-export const SUBSCRIPTION_STATUSES = ['trial', 'active', 'expired', 'cancelled'] as const;
+export const SUBSCRIPTION_STATUSES = [
+  'trial',
+  'active',
+  'expired',
+  'cancelled',
+] as const;
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
 
 // Toute mutation admin exige un motif, consigné dans admin_audit_logs

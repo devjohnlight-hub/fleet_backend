@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { AdminAuditService } from './admin-audit.service';
 import {
@@ -37,7 +41,8 @@ export class AdminStaffService {
     do {
       const page = await admin.auth().listUsers(1000, pageToken);
       for (const user of page.users) {
-        if (isStaffRole(user.customClaims?.[STAFF_ROLE_CLAIM])) members.push(this.toMember(user));
+        if (isStaffRole(user.customClaims?.[STAFF_ROLE_CLAIM]))
+          members.push(this.toMember(user));
       }
       pageToken = page.pageToken;
     } while (pageToken);
@@ -52,12 +57,20 @@ export class AdminStaffService {
     }
     const current = this.roleOf(user);
     if (current) {
-      throw new ConflictException(`Ce compte est déjà staff (${current}) : utiliser PATCH /admin/v1/staff/:uid`);
+      throw new ConflictException(
+        `Ce compte est déjà staff (${current}) : utiliser PATCH /admin/v1/staff/:uid`,
+      );
     }
 
     return this.auditService.record(
       actor,
-      { action: 'staff.grant', targetType: 'staff', targetId: user.uid, reason: dto.reason, before: { role: null } },
+      {
+        action: 'staff.grant',
+        targetType: 'staff',
+        targetId: user.uid,
+        reason: dto.reason,
+        before: { role: null },
+      },
       async () => {
         const member = await this.applyRole(user, dto.role);
         return { result: member, after: { role: dto.role } };
@@ -76,8 +89,12 @@ export class AdminStaffService {
     }
     const user = await admin.auth().getUser(uid);
     const current = this.roleOf(user);
-    if (!current) throw new NotFoundException('Ce compte n\'est pas staff : utiliser POST /admin/v1/staff');
-    if (current === dto.role) return { member: this.toMember(user), changed: false };
+    if (!current)
+      throw new NotFoundException(
+        "Ce compte n'est pas staff : utiliser POST /admin/v1/staff",
+      );
+    if (current === dto.role)
+      return { member: this.toMember(user), changed: false };
 
     return this.auditService.record(
       actor,
@@ -96,7 +113,10 @@ export class AdminStaffService {
   }
 
   // Révoque les sessions pour que le nouveau claim s'applique dès la reconnexion
-  private async applyRole(user: admin.auth.UserRecord, role: StaffRole | null): Promise<StaffMember> {
+  private async applyRole(
+    user: admin.auth.UserRecord,
+    role: StaffRole | null,
+  ): Promise<StaffMember> {
     const claims = { ...(user.customClaims ?? {}) };
     if (role === null) delete claims[STAFF_ROLE_CLAIM];
     else claims[STAFF_ROLE_CLAIM] = role;

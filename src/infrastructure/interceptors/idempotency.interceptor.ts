@@ -30,12 +30,17 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
   constructor(private readonly redisService: RedisService) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
+  async intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Promise<Observable<unknown>> {
     const request = context.switchToHttp().getRequest<Request>();
     const key = request.headers['idempotency-key'];
     if (key === undefined) return next.handle();
     if (typeof key !== 'string' || !/^[\w-]{8,128}$/.test(key)) {
-      throw new BadRequestException('Idempotency-Key invalide (8 à 128 caractères [A-Za-z0-9_-])');
+      throw new BadRequestException(
+        'Idempotency-Key invalide (8 à 128 caractères [A-Za-z0-9_-])',
+      );
     }
 
     const staff = request['staff'] as StaffUser;
@@ -52,16 +57,22 @@ export class IdempotencyInterceptor implements NestInterceptor {
     if (!acquired) {
       const existing = await this.redisService.get<StoredEntry>(redisKey);
       if (existing && existing.fingerprint !== fingerprint) {
-        throw new UnprocessableEntityException('Idempotency-Key déjà utilisée avec un autre corps de requête');
+        throw new UnprocessableEntityException(
+          'Idempotency-Key déjà utilisée avec un autre corps de requête',
+        );
       }
       if (existing?.state === 'done') return of(existing.response);
-      throw new ConflictException('Une requête avec cette Idempotency-Key est déjà en cours');
+      throw new ConflictException(
+        'Une requête avec cette Idempotency-Key est déjà en cours',
+      );
     }
 
     return next.handle().pipe(
       // Échec : on libère la clé pour permettre une nouvelle tentative
       catchError((err: unknown) =>
-        from(this.redisService.del(redisKey)).pipe(mergeMap(() => throwError(() => err))),
+        from(this.redisService.del(redisKey)).pipe(
+          mergeMap(() => throwError(() => err)),
+        ),
       ),
       mergeMap(async (response: unknown) => {
         const done: StoredEntry = { state: 'done', fingerprint, response };
@@ -69,7 +80,9 @@ export class IdempotencyInterceptor implements NestInterceptor {
           await this.redisService.set(redisKey, done, TTL_SECONDS);
         } catch (err) {
           // La mutation a réussi : on ne la fait pas échouer pour un problème de cache
-          this.logger.error(`Stockage idempotence impossible : ${(err as Error).message}`);
+          this.logger.error(
+            `Stockage idempotence impossible : ${(err as Error).message}`,
+          );
           await this.redisService.del(redisKey).catch(() => undefined);
         }
         return response;

@@ -29,8 +29,13 @@ export class AdminClientService {
 
     // auth/user-not-found → 404 via HttpExceptionFilter
     const user = await admin.auth().getUser(uid);
-    if (isStaffRole(user.customClaims?.[STAFF_ROLE_CLAIM]) && staff.role !== StaffRole.SUPER_ADMIN) {
-      throw new ForbiddenException('Seul un super_admin peut modifier l\'accès d\'un compte staff');
+    if (
+      isStaffRole(user.customClaims?.[STAFF_ROLE_CLAIM]) &&
+      staff.role !== StaffRole.SUPER_ADMIN
+    ) {
+      throw new ForbiddenException(
+        "Seul un super_admin peut modifier l'accès d'un compte staff",
+      );
     }
 
     if (user.disabled === dto.disabled) {

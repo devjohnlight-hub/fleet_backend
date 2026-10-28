@@ -1,4 +1,11 @@
-import { Body, Controller, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AdminSubscriptionService } from '../../core/application/services/admin-subscription.service';
 import { AdminSubscriptionAdjustmentDto } from '../../core/application/dtos/admin-mutations.dto';
 import { StaffRole, StaffUser } from '../../core/domain/entities/staff-role';
@@ -10,7 +17,9 @@ import { IdempotencyInterceptor } from '../interceptors/idempotency.interceptor'
 @UseGuards(StaffAuthGuard)
 @Controller('admin/v1/subscriptions')
 export class AdminSubscriptionController {
-  constructor(private readonly adminSubscriptionService: AdminSubscriptionService) {}
+  constructor(
+    private readonly adminSubscriptionService: AdminSubscriptionService,
+  ) {}
 
   @Post(':uid/adjustments')
   @StaffRoles(StaffRole.BILLING, StaffRole.SUPER_ADMIN)

@@ -40,7 +40,9 @@ export class AdminHealthService {
     };
   }
 
-  private async measure(probe: () => Promise<unknown>): Promise<DependencyCheck> {
+  private async measure(
+    probe: () => Promise<unknown>,
+  ): Promise<DependencyCheck> {
     const start = Date.now();
     try {
       await probe();

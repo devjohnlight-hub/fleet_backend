@@ -2,7 +2,12 @@ import * as admin from 'firebase-admin';
 import { FirestoreService } from '../../../infrastructure/firebase/firestore.service';
 import { StaffUser } from '../../domain/entities/staff-role';
 import { AdminAuditLogsQueryDto } from '../dtos/admin-queries.dto';
-import { CursorPage, DEFAULT_PAGE_SIZE, paginate, toIso } from './admin-pagination';
+import {
+  CursorPage,
+  DEFAULT_PAGE_SIZE,
+  paginate,
+  toIso,
+} from './admin-pagination';
 
 const COLLECTION = 'admin_audit_logs';
 const REDACTED = '[REDACTED]';
@@ -43,10 +48,17 @@ export class AdminAuditService {
   }
 
   // Les filtres combinés à orderBy(createdAt) demandent des index composites Firestore
-  async list(query: AdminAuditLogsQueryDto): Promise<CursorPage<Record<string, unknown>>> {
+  async list(
+    query: AdminAuditLogsQueryDto,
+  ): Promise<CursorPage<Record<string, unknown>>> {
     const collection = this.firestoreService.collection(COLLECTION);
     let filtered: admin.firestore.Query = collection;
-    for (const field of ['targetType', 'targetId', 'actorUid', 'action'] as const) {
+    for (const field of [
+      'targetType',
+      'targetId',
+      'actorUid',
+      'action',
+    ] as const) {
       if (query[field]) filtered = filtered.where(field, '==', query[field]);
     }
 
@@ -55,7 +67,11 @@ export class AdminAuditService {
       collection,
       query.cursor,
       query.limit ?? DEFAULT_PAGE_SIZE,
-      (doc) => ({ id: doc.id, ...doc.data(), createdAt: toIso(doc.get('createdAt')) }),
+      (doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: toIso(doc.get('createdAt')),
+      }),
     );
   }
 
@@ -63,7 +79,10 @@ export class AdminAuditService {
   async record<T>(
     actor: StaffUser,
     entry: Omit<AdminAuditEntry, 'result' | 'after' | 'error'>,
-    operation: () => Promise<{ result: T; after: Record<string, unknown> | null }>,
+    operation: () => Promise<{
+      result: T;
+      after: Record<string, unknown> | null;
+    }>,
   ): Promise<T> {
     let outcome: { result: T; after: Record<string, unknown> | null };
     try {
@@ -76,7 +95,11 @@ export class AdminAuditService {
       });
       throw err;
     }
-    await this.log(actor, { ...entry, result: 'success', after: outcome.after });
+    await this.log(actor, {
+      ...entry,
+      result: 'success',
+      after: outcome.after,
+    });
     return outcome.result;
   }
 
@@ -86,7 +109,10 @@ export class AdminAuditService {
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>)
         .filter(([, v]) => v !== undefined)
-        .map(([k, v]) => [k, SENSITIVE_KEY.test(k) ? REDACTED : this.redact(v)]),
+        .map(([k, v]) => [
+          k,
+          SENSITIVE_KEY.test(k) ? REDACTED : this.redact(v),
+        ]),
     );
   }
 }

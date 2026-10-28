@@ -29,8 +29,14 @@ export class AdminSubscriptionService {
     uid: string,
     dto: AdminSubscriptionAdjustmentDto,
   ): Promise<SubscriptionAdjustmentResult> {
-    if (dto.planId === undefined && dto.status === undefined && dto.endDate === undefined) {
-      throw new BadRequestException('Aucun changement demandé (planId, status ou endDate)');
+    if (
+      dto.planId === undefined &&
+      dto.status === undefined &&
+      dto.endDate === undefined
+    ) {
+      throw new BadRequestException(
+        'Aucun changement demandé (planId, status ou endDate)',
+      );
     }
 
     const ref = this.firestoreService.collection('subscriptions').doc(uid);
@@ -44,11 +50,17 @@ export class AdminSubscriptionService {
 
     // Les permissions de l'abonnement sont une copie de celles du plan
     if (dto.planId !== undefined) {
-      const plan = await this.firestoreService.collection('plans').doc(dto.planId).get();
-      if (!plan.exists) throw new BadRequestException(`Plan inconnu : ${dto.planId}`);
+      const plan = await this.firestoreService
+        .collection('plans')
+        .doc(dto.planId)
+        .get();
+      if (!plan.exists)
+        throw new BadRequestException(`Plan inconnu : ${dto.planId}`);
       const permissions: unknown = plan.get('permissions');
       if (!permissions || typeof permissions !== 'object') {
-        throw new BadRequestException(`Le plan ${dto.planId} n'a pas de permissions`);
+        throw new BadRequestException(
+          `Le plan ${dto.planId} n'a pas de permissions`,
+        );
       }
       update.planId = dto.planId;
       update.permissions = permissions;
@@ -57,12 +69,17 @@ export class AdminSubscriptionService {
 
     const endDate = dto.endDate
       ? new Date(dto.endDate)
-      : (snapshot.get('endDate') as admin.firestore.Timestamp | undefined)?.toDate() ?? null;
-    if (dto.endDate) update.endDate = admin.firestore.Timestamp.fromDate(endDate!);
+      : ((
+          snapshot.get('endDate') as admin.firestore.Timestamp | undefined
+        )?.toDate() ?? null);
+    if (dto.endDate)
+      update.endDate = admin.firestore.Timestamp.fromDate(endDate!);
     this.assertCoherent(
       dto.status ?? before.status,
       endDate,
-      (snapshot.get('startDate') as admin.firestore.Timestamp | undefined)?.toDate() ?? null,
+      (
+        snapshot.get('startDate') as admin.firestore.Timestamp | undefined
+      )?.toDate() ?? null,
     );
 
     return this.auditService.record(
@@ -82,21 +99,39 @@ export class AdminSubscriptionService {
     );
   }
 
-  private assertCoherent(status: string | null, endDate: Date | null, startDate: Date | null): void {
+  private assertCoherent(
+    status: string | null,
+    endDate: Date | null,
+    startDate: Date | null,
+  ): void {
     const now = Date.now();
     if (endDate && startDate && endDate <= startDate) {
-      throw new BadRequestException('endDate doit être postérieure à startDate');
+      throw new BadRequestException(
+        'endDate doit être postérieure à startDate',
+      );
     }
-    if ((status === 'active' || status === 'trial') && endDate && endDate.getTime() <= now) {
-      throw new BadRequestException(`Un abonnement "${status}" ne peut pas avoir une date de fin passée`);
+    if (
+      (status === 'active' || status === 'trial') &&
+      endDate &&
+      endDate.getTime() <= now
+    ) {
+      throw new BadRequestException(
+        `Un abonnement "${status}" ne peut pas avoir une date de fin passée`,
+      );
     }
     if (status === 'expired' && endDate && endDate.getTime() > now) {
-      throw new BadRequestException('Un abonnement "expired" ne peut pas avoir une date de fin future');
+      throw new BadRequestException(
+        'Un abonnement "expired" ne peut pas avoir une date de fin future',
+      );
     }
   }
 
-  private toState(snapshot: admin.firestore.DocumentSnapshot): SubscriptionState {
-    const endDate = snapshot.get('endDate') as admin.firestore.Timestamp | undefined;
+  private toState(
+    snapshot: admin.firestore.DocumentSnapshot,
+  ): SubscriptionState {
+    const endDate = snapshot.get('endDate') as
+      | admin.firestore.Timestamp
+      | undefined;
     return {
       planId: snapshot.get('planId') ?? null,
       status: snapshot.get('status') ?? null,

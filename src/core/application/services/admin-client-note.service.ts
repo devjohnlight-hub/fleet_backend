@@ -4,7 +4,12 @@ import { AdminAuditService } from './admin-audit.service';
 import { AdminCreateClientNoteDto } from '../dtos/admin-mutations.dto';
 import { AdminCursorQueryDto } from '../dtos/admin-queries.dto';
 import { StaffUser } from '../../domain/entities/staff-role';
-import { CursorPage, DEFAULT_PAGE_SIZE, paginate, toIso } from './admin-pagination';
+import {
+  CursorPage,
+  DEFAULT_PAGE_SIZE,
+  paginate,
+  toIso,
+} from './admin-pagination';
 
 const COLLECTION = 'admin_client_notes';
 
@@ -24,7 +29,11 @@ export class AdminClientNoteService {
     private readonly auditService: AdminAuditService,
   ) {}
 
-  async create(staff: StaffUser, uid: string, dto: AdminCreateClientNoteDto): Promise<ClientNote> {
+  async create(
+    staff: StaffUser,
+    uid: string,
+    dto: AdminCreateClientNoteDto,
+  ): Promise<ClientNote> {
     // auth/user-not-found → 404 via HttpExceptionFilter
     await admin.auth().getUser(uid);
 
@@ -45,7 +54,10 @@ export class AdminClientNoteService {
     );
   }
 
-  async list(uid: string, query: AdminCursorQueryDto): Promise<CursorPage<ClientNote>> {
+  async list(
+    uid: string,
+    query: AdminCursorQueryDto,
+  ): Promise<CursorPage<ClientNote>> {
     const collection = this.firestoreService.collection(COLLECTION);
     return paginate(
       collection.where('clientId', '==', uid).orderBy('createdAt', 'desc'),

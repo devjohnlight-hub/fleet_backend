@@ -72,7 +72,12 @@ export class AdminDeviceController {
     @Param('deviceId', ParseIntPipe) deviceId: number,
     @Body() dto: AdminReasonDto,
   ) {
-    return this.adminDeviceService.setDisabled(staff, deviceId, true, dto.reason);
+    return this.adminDeviceService.setDisabled(
+      staff,
+      deviceId,
+      true,
+      dto.reason,
+    );
   }
 
   @Post(':deviceId/enable')
@@ -84,7 +89,12 @@ export class AdminDeviceController {
     @Param('deviceId', ParseIntPipe) deviceId: number,
     @Body() dto: AdminReasonDto,
   ) {
-    return this.adminDeviceService.setDisabled(staff, deviceId, false, dto.reason);
+    return this.adminDeviceService.setDisabled(
+      staff,
+      deviceId,
+      false,
+      dto.reason,
+    );
   }
 
   @Post(':deviceId/link')

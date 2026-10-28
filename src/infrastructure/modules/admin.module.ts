@@ -45,7 +45,8 @@ import { RedisService } from '../redis/redis.service';
         firestoreService: FirestoreService,
         redisService: RedisService,
         traccarClient: TraccarHttpClient,
-      ) => new AdminHealthService(firestoreService, redisService, traccarClient),
+      ) =>
+        new AdminHealthService(firestoreService, redisService, traccarClient),
       inject: [FirestoreService, RedisService, TraccarHttpClient],
     },
     {

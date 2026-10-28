@@ -51,7 +51,10 @@ export class StaffAuthGuard implements CanActivate {
     }
 
     const requestId = this.extractRequestId(request);
-    context.switchToHttp().getResponse<Response>().setHeader('X-Request-Id', requestId);
+    context
+      .switchToHttp()
+      .getResponse<Response>()
+      .setHeader('X-Request-Id', requestId);
 
     request['staff'] = {
       id: decoded.uid,

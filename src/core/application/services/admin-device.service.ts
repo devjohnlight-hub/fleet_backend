@@ -35,7 +35,9 @@ export type DeviceIssue =
   | 'OWNER_NOT_LINKED_TRACCAR'
   | 'OWNER_NO_TRACCAR_PERMISSION';
 
-export type OrphanVehicleReason = 'DEVICE_NOT_FOUND' | 'DEVICE_NOT_IN_CLIENT_ACCOUNT';
+export type OrphanVehicleReason =
+  | 'DEVICE_NOT_FOUND'
+  | 'DEVICE_NOT_IN_CLIENT_ACCOUNT';
 
 // Projections Firestore : on ne lit jamais traccarPassword / fcmToken
 interface VehicleSummary {
@@ -130,7 +132,9 @@ export class AdminDeviceService {
         client.traccarUserId === null
           ? []
           : await this.traccar(() =>
-              this.traccarDeviceService.findAll({ userId: client.traccarUserId! }),
+              this.traccarDeviceService.findAll({
+                userId: client.traccarUserId!,
+              }),
             );
       vehicles = (await this.findVehiclesByOwner(query.clientId)).filter(
         (v) => v.deviceId !== null,
@@ -148,24 +152,46 @@ export class AdminDeviceService {
     );
 
     const now = Date.now();
-    const staleBefore = query.staleBefore ? Date.parse(query.staleBefore) : null;
+    const staleBefore = query.staleBefore
+      ? Date.parse(query.staleBefore)
+      : null;
     const cursor = query.cursor ? Number(query.cursor) : null;
 
     const filtered = devices
       .map((device) =>
-        this.toItem(device, vehiclesByDevice.get(device.getId()) ?? [], clients, now),
+        this.toItem(
+          device,
+          vehiclesByDevice.get(device.getId()) ?? [],
+          clients,
+          now,
+        ),
       )
       .filter((item) => {
         if (query.status && item.status !== query.status) return false;
-        if (query.disabled !== undefined && item.disabled !== query.disabled) return false;
-        if (query.unlinked !== undefined && (item.vehicle === null) !== query.unlinked) return false;
-        if (query.neverSeen !== undefined && (item.lastUpdate === null) !== query.neverSeen) return false;
-        if (staleBefore !== null && item.lastUpdate !== null && Date.parse(item.lastUpdate) >= staleBefore) return false;
+        if (query.disabled !== undefined && item.disabled !== query.disabled)
+          return false;
+        if (
+          query.unlinked !== undefined &&
+          (item.vehicle === null) !== query.unlinked
+        )
+          return false;
+        if (
+          query.neverSeen !== undefined &&
+          (item.lastUpdate === null) !== query.neverSeen
+        )
+          return false;
+        if (
+          staleBefore !== null &&
+          item.lastUpdate !== null &&
+          Date.parse(item.lastUpdate) >= staleBefore
+        )
+          return false;
         return true;
       })
       .sort((a, b) => a.id - b.id);
 
-    const remaining = cursor === null ? filtered : filtered.filter((i) => i.id > cursor);
+    const remaining =
+      cursor === null ? filtered : filtered.filter((i) => i.id > cursor);
     const items = remaining.slice(0, limit);
     const hasMore = remaining.length > limit;
 
@@ -196,12 +222,16 @@ export class AdminDeviceService {
     );
     const item = this.toItem(device, vehicles, clients, Date.now());
 
-    const owner = vehicles[0]?.ownerId ? clients.get(vehicles[0].ownerId) : undefined;
+    const owner = vehicles[0]?.ownerId
+      ? clients.get(vehicles[0].ownerId)
+      : undefined;
     const [lastPosition, ownerDevices] = await Promise.all([
       device.getPositionId() === null
         ? Promise.resolve([] as TraccarPosition[])
         : this.traccar(() =>
-            this.traccarPositionService.findAll({ id: device.getPositionId()! }),
+            this.traccarPositionService.findAll({
+              id: device.getPositionId()!,
+            }),
           ),
       owner?.traccarUserId == null
         ? Promise.resolve(null)
@@ -262,7 +292,13 @@ export class AdminDeviceService {
 
     return this.auditService.record(
       staff,
-      { action: 'device.update', targetType: 'device', targetId: String(deviceId), reason, before },
+      {
+        action: 'device.update',
+        targetType: 'device',
+        targetId: String(deviceId),
+        reason,
+        before,
+      },
       async () => {
         const updated = await this.putDevice(device, changes);
         if (updated.getUniqueId() !== device.getUniqueId()) {
@@ -296,7 +332,9 @@ export class AdminDeviceService {
         before: { disabled: device.isDisabled() },
       },
       async () => {
-        const after = this.editableFields(await this.putDevice(device, { disabled }));
+        const after = this.editableFields(
+          await this.putDevice(device, { disabled }),
+        );
         return {
           result: { deviceId, changed: true, device: after },
           after: { disabled: after.disabled },
@@ -312,29 +350,36 @@ export class AdminDeviceService {
   ): Promise<DeviceLinkResult> {
     const device = await this.getDeviceOrThrow(deviceId);
 
-    const vehicleRef = this.firestoreService.collection('vehicles').doc(dto.vehicleId);
+    const vehicleRef = this.firestoreService
+      .collection('vehicles')
+      .doc(dto.vehicleId);
     const vehicle = await vehicleRef.get();
     if (!vehicle.exists) throw new NotFoundException('Véhicule introuvable');
     if (vehicle.get('ownerId') !== dto.ownerId) {
-      throw new BadRequestException('Le véhicule n\'appartient pas à ce client');
+      throw new BadRequestException("Le véhicule n'appartient pas à ce client");
     }
 
     const client = await this.findClient(dto.ownerId);
     if (!client) throw new NotFoundException('Client introuvable');
     if (client.traccarUserId === null) {
-      throw new BadRequestException('Le client n\'a pas de compte Traccar');
+      throw new BadRequestException("Le client n'a pas de compte Traccar");
     }
 
     // On ne déplace jamais implicitement un rattachement existant
-    const vehicleDeviceId = (vehicle.get('deviceId') as number | null | undefined) ?? null;
+    const vehicleDeviceId =
+      (vehicle.get('deviceId') as number | null | undefined) ?? null;
     if (vehicleDeviceId !== null && vehicleDeviceId !== deviceId) {
-      throw new ConflictException(`Véhicule déjà rattaché au device ${vehicleDeviceId}`);
+      throw new ConflictException(
+        `Véhicule déjà rattaché au device ${vehicleDeviceId}`,
+      );
     }
     const otherVehicles = (await this.findVehiclesByDeviceId(deviceId)).filter(
       (v) => v.id !== dto.vehicleId,
     );
     if (otherVehicles.length > 0) {
-      throw new ConflictException(`Device déjà rattaché au véhicule ${otherVehicles[0].id}`);
+      throw new ConflictException(
+        `Device déjà rattaché au véhicule ${otherVehicles[0].id}`,
+      );
     }
 
     const ownerDevices = await this.traccar(() =>
@@ -343,22 +388,36 @@ export class AdminDeviceService {
     const hasPermission = ownerDevices.some((d) => d.getId() === deviceId);
     const before = {
       vehicleDeviceId,
-      vehicleUniqueId: (vehicle.get('uniqueId') as string | null | undefined) ?? null,
+      vehicleUniqueId:
+        (vehicle.get('uniqueId') as string | null | undefined) ?? null,
       ownerHasTraccarPermission: hasPermission,
     };
 
     const result = { deviceId, vehicleId: dto.vehicleId, ownerId: dto.ownerId };
-    if (hasPermission && vehicleDeviceId === deviceId && before.vehicleUniqueId === device.getUniqueId()) {
+    if (
+      hasPermission &&
+      vehicleDeviceId === deviceId &&
+      before.vehicleUniqueId === device.getUniqueId()
+    ) {
       return { ...result, changed: false };
     }
 
     return this.auditService.record(
       staff,
-      { action: 'device.link', targetType: 'device', targetId: String(deviceId), reason: dto.reason, before },
+      {
+        action: 'device.link',
+        targetType: 'device',
+        targetId: String(deviceId),
+        reason: dto.reason,
+        before,
+      },
       async () => {
         if (!hasPermission) {
           await this.traccar(() =>
-            this.traccarClient.linkDeviceToUser(client.traccarUserId!, deviceId),
+            this.traccarClient.linkDeviceToUser(
+              client.traccarUserId!,
+              deviceId,
+            ),
           );
         }
         await vehicleRef.update({ deviceId, uniqueId: device.getUniqueId() });
@@ -395,11 +454,17 @@ export class AdminDeviceService {
     );
   }
 
-  private async syncVehicleUniqueId(deviceId: number, uniqueId: string): Promise<void> {
+  private async syncVehicleUniqueId(
+    deviceId: number,
+    uniqueId: string,
+  ): Promise<void> {
     const vehicles = await this.findVehiclesByDeviceId(deviceId);
     await Promise.all(
       vehicles.map((v) =>
-        this.firestoreService.collection('vehicles').doc(v.id).update({ uniqueId }),
+        this.firestoreService
+          .collection('vehicles')
+          .doc(v.id)
+          .update({ uniqueId }),
       ),
     );
   }
@@ -431,10 +496,12 @@ export class AdminDeviceService {
       issues.push('NO_VEHICLE');
     } else {
       if (vehicles.length > 1) issues.push('MULTIPLE_VEHICLES');
-      if (vehicle.uniqueId !== device.getUniqueId()) issues.push('UNIQUE_ID_MISMATCH');
+      if (vehicle.uniqueId !== device.getUniqueId())
+        issues.push('UNIQUE_ID_MISMATCH');
       client = vehicle.ownerId ? (clients.get(vehicle.ownerId) ?? null) : null;
       if (!client) issues.push('OWNER_NOT_FOUND');
-      else if (client.traccarUserId === null) issues.push('OWNER_NOT_LINKED_TRACCAR');
+      else if (client.traccarUserId === null)
+        issues.push('OWNER_NOT_LINKED_TRACCAR');
     }
 
     const lastUpdate = device.getLastUpdate();
@@ -459,7 +526,9 @@ export class AdminDeviceService {
             uniqueId: vehicle.uniqueId,
           }
         : null,
-      client: client ? { id: client.id, email: client.email, name: client.name } : null,
+      client: client
+        ? { id: client.id, email: client.email, name: client.name }
+        : null,
       issues,
     };
   }
@@ -472,7 +541,9 @@ export class AdminDeviceService {
     return devices[0];
   }
 
-  private groupByDeviceId(vehicles: VehicleSummary[]): Map<number, VehicleSummary[]> {
+  private groupByDeviceId(
+    vehicles: VehicleSummary[],
+  ): Map<number, VehicleSummary[]> {
     const map = new Map<number, VehicleSummary[]>();
     for (const v of vehicles) {
       if (v.deviceId === null) continue;
@@ -483,23 +554,35 @@ export class AdminDeviceService {
 
   private async findVehiclesWithDevice(): Promise<VehicleSummary[]> {
     return this.queryVehicles(
-      this.firestoreService.collection('vehicles').where('deviceId', '!=', null),
+      this.firestoreService
+        .collection('vehicles')
+        .where('deviceId', '!=', null),
     );
   }
 
-  private async findVehiclesByOwner(ownerId: string): Promise<VehicleSummary[]> {
+  private async findVehiclesByOwner(
+    ownerId: string,
+  ): Promise<VehicleSummary[]> {
     return this.queryVehicles(
-      this.firestoreService.collection('vehicles').where('ownerId', '==', ownerId),
+      this.firestoreService
+        .collection('vehicles')
+        .where('ownerId', '==', ownerId),
     );
   }
 
-  private async findVehiclesByDeviceId(deviceId: number): Promise<VehicleSummary[]> {
+  private async findVehiclesByDeviceId(
+    deviceId: number,
+  ): Promise<VehicleSummary[]> {
     return this.queryVehicles(
-      this.firestoreService.collection('vehicles').where('deviceId', '==', deviceId),
+      this.firestoreService
+        .collection('vehicles')
+        .where('deviceId', '==', deviceId),
     );
   }
 
-  private async queryVehicles(query: admin.firestore.Query): Promise<VehicleSummary[]> {
+  private async queryVehicles(
+    query: admin.firestore.Query,
+  ): Promise<VehicleSummary[]> {
     const snapshot = await query
       .select('label', 'plate', 'ownerId', 'deviceId', 'uniqueId')
       .get();
@@ -517,7 +600,9 @@ export class AdminDeviceService {
     return (await this.findClients([uid])).get(uid) ?? null;
   }
 
-  private async findClients(uids: string[]): Promise<Map<string, ClientSummary>> {
+  private async findClients(
+    uids: string[],
+  ): Promise<Map<string, ClientSummary>> {
     const unique = [...new Set(uids)];
     const chunks: string[][] = [];
     for (let i = 0; i < unique.length; i += FIRESTORE_IN_CHUNK) {

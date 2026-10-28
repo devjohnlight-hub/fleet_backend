@@ -35,5 +35,7 @@ export async function paginate<T>(
 }
 
 export function toIso(value: unknown): string | null {
-  return value instanceof admin.firestore.Timestamp ? value.toDate().toISOString() : null;
+  return value instanceof admin.firestore.Timestamp
+    ? value.toDate().toISOString()
+    : null;
 }
