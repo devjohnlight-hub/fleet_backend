@@ -19,6 +19,7 @@ import { FirestoreUserModule } from './infrastructure/modules/firestore-user.mod
 import { FirestoreVehicleModule } from './infrastructure/modules/firestore-vehicle.module';
 import { FleetWebsocketModule } from './infrastructure/modules/fleet-websocket.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
+import { AdminModule } from './infrastructure/modules/admin.module';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import Redis from 'ioredis';
@@ -64,6 +65,7 @@ import { APP_GUARD } from '@nestjs/core';
     FirestoreUserModule,
     FirestoreVehicleModule,
     FleetWebsocketModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
