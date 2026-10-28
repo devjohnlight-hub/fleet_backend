@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsEmail,
   IsIn,
   IsInt,
   IsISO8601,
@@ -8,7 +9,9 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
+import { StaffRole } from '../../domain/entities/staff-role';
 
 export const SUBSCRIPTION_STATUSES = ['trial', 'active', 'expired', 'cancelled'] as const;
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
@@ -82,4 +85,26 @@ export class AdminLinkDeviceDto extends AdminReasonDto {
   @IsString()
   @IsNotEmpty()
   ownerId: string;
+}
+
+export class AdminGrantStaffDto extends AdminReasonDto {
+  @IsEmail()
+  email: string;
+
+  @IsIn(Object.values(StaffRole))
+  role: StaffRole;
+}
+
+// role: null retire l'accès staff
+export class AdminUpdateStaffRoleDto extends AdminReasonDto {
+  @ValidateIf((o: AdminUpdateStaffRoleDto) => o.role !== null)
+  @IsIn(Object.values(StaffRole))
+  role: StaffRole | null;
+}
+
+export class AdminCreateClientNoteDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(2000)
+  body: string;
 }

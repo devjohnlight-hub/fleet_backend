@@ -74,12 +74,17 @@ Code écrit le 2026-10-28, build OK, routes protégées (401 sans token). **Test
 - [x] `Idempotency-Key` (Redis, 24 h, par staff + méthode + chemin) : rejoue la réponse, 409 si en cours, 422 si corps différent ; clé libérée en cas d'échec.
 - Audit via `AdminAuditService.record()` (succès et échec). No-op (état déjà atteint) → `changed: false`, pas d'audit.
 
-### Étape 5 — Gestion staff et utilitaires
-- [ ] `GET/POST/PATCH /admin/v1/staff` — `super_admin` uniquement (remplace le script à terme).
-- [ ] `POST /admin/v1/clients/:uid/notes` (optionnel si Next.js écrit directement).
-- [ ] `GET /admin/v1/documents/:id/download-url` — URL signée courte + audit.
-- [ ] `GET /admin/v1/audit-logs?targetId=&actor=&cursor=` (si Next.js ne lit pas directement la collection).
-- [ ] `POST /admin/v1/jobs/:name/run` — `super_admin`, pour remplacer les appels aux Cloud Functions `*Now` (à sécuriser côté Functions).
+### 🚧 Étape 5 — Gestion staff et utilitaires
+Code écrit le 2026-10-28, build OK, routes protégées (401 sans token). **Tests avec token staff à faire.**
+
+- [x] `GET /admin/v1/staff` — `super_admin`. Parcourt Firebase Auth (`listUsers`) et filtre sur le claim ; expose `mfaEnrolled`.
+- [x] `POST /admin/v1/staff` `{ email, role, reason }` — `super_admin`. Compte Auth existant uniquement ; 409 si déjà staff.
+- [x] `PATCH /admin/v1/staff/:uid` `{ role | null, reason }` — `super_admin`. `null` retire l'accès ; refus sur soi-même (garantit qu'il reste un super_admin). Révoque les sessions.
+- [x] `GET/POST /admin/v1/clients/:uid/notes` `{ body }` — lecture `support`/`billing`/`super_admin`, écriture `support`/`super_admin`. Collection `admin_client_notes`, append-only.
+- [x] `GET /admin/v1/audit-logs?targetType=&targetId=&actorUid=&action=&cursor=&limit=` — `super_admin`, `support`, `billing`.
+- [ ] `GET /admin/v1/documents/:id/download-url` — **reporté** : les fichiers sont sur Cloudinary en `type: upload` (URL publiques permanentes). Une URL signée n'a de sens qu'après migration en `type: authenticated`.
+- [ ] `POST /admin/v1/jobs/:name/run` — **reporté** : nécessite le dépôt Cloud Functions (URLs et sécurisation des endpoints `*Now`).
+- Index Firestore composites probablement requis : `admin_client_notes (clientId, createdAt desc)` et `admin_audit_logs (<filtre>, createdAt desc)` — le lien de création apparaît dans l'erreur `FAILED_PRECONDITION`.
 
 ### Étape 6 — Tests
 - [ ] Tests unitaires `StaffAuthGuard` (sans token, token client, rôle insuffisant, rôle OK).
@@ -93,3 +98,6 @@ Code écrit le 2026-10-28, build OK, routes protégées (401 sans token). **Test
 3. `/traccar/groups`, `/companies`, `/vehicules` : aucun guard.
 4. Côté Cloud Functions (autre dépôt) : `activateSubscription` lit `uid` du payload ; endpoints `*Now` et `runSubscriptionMigration` sans garde d'auth.
 5. Changer les mots de passe des comptes de test partagés en clair pendant la session du 2026-10-12.
+6. `POST /files/upload` (`file-upload.controller.ts`) : **aucun guard** — upload anonyme vers le compte Cloudinary, `folder` libre.
+7. Documents clients stockés en Cloudinary public (`type: upload`) : toute `fileUrl` est accessible sans authentification.
+8. À vérifier : `PUT /traccar/devices/:id` envoie un objet partiel à Traccar, qui remplace l'entité entière → risque d'effacement des champs absents.

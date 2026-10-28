@@ -1,6 +1,8 @@
 import * as admin from 'firebase-admin';
 import { FirestoreService } from '../../../infrastructure/firebase/firestore.service';
 import { StaffUser } from '../../domain/entities/staff-role';
+import { AdminAuditLogsQueryDto } from '../dtos/admin-queries.dto';
+import { CursorPage, DEFAULT_PAGE_SIZE, paginate, toIso } from './admin-pagination';
 
 const COLLECTION = 'admin_audit_logs';
 const REDACTED = '[REDACTED]';
@@ -38,6 +40,23 @@ export class AdminAuditService {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     return ref.id;
+  }
+
+  // Les filtres combinés à orderBy(createdAt) demandent des index composites Firestore
+  async list(query: AdminAuditLogsQueryDto): Promise<CursorPage<Record<string, unknown>>> {
+    const collection = this.firestoreService.collection(COLLECTION);
+    let filtered: admin.firestore.Query = collection;
+    for (const field of ['targetType', 'targetId', 'actorUid', 'action'] as const) {
+      if (query[field]) filtered = filtered.where(field, '==', query[field]);
+    }
+
+    return paginate(
+      filtered.orderBy('createdAt', 'desc'),
+      collection,
+      query.cursor,
+      query.limit ?? DEFAULT_PAGE_SIZE,
+      (doc) => ({ id: doc.id, ...doc.data(), createdAt: toIso(doc.get('createdAt')) }),
+    );
   }
 
   // Exécute une mutation et la consigne, en succès comme en échec

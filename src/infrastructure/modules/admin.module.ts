@@ -3,6 +3,10 @@ import { AdminHealthController } from '../controllers/admin-health.controller';
 import { AdminDeviceController } from '../controllers/admin-device.controller';
 import { AdminClientController } from '../controllers/admin-client.controller';
 import { AdminSubscriptionController } from '../controllers/admin-subscription.controller';
+import { AdminStaffController } from '../controllers/admin-staff.controller';
+import { AdminAuditLogController } from '../controllers/admin-audit-log.controller';
+import { AdminStaffService } from '../../core/application/services/admin-staff.service';
+import { AdminClientNoteService } from '../../core/application/services/admin-client-note.service';
 import { AdminHealthService } from '../../core/application/services/admin-health.service';
 import { AdminDeviceService } from '../../core/application/services/admin-device.service';
 import { AdminClientService } from '../../core/application/services/admin-client.service';
@@ -22,6 +26,8 @@ import { RedisService } from '../redis/redis.service';
     AdminDeviceController,
     AdminClientController,
     AdminSubscriptionController,
+    AdminStaffController,
+    AdminAuditLogController,
   ],
   providers: [
     StaffAuthGuard,
@@ -70,6 +76,20 @@ import { RedisService } from '../redis/redis.service';
         firestoreService: FirestoreService,
         auditService: AdminAuditService,
       ) => new AdminSubscriptionService(firestoreService, auditService),
+      inject: [FirestoreService, AdminAuditService],
+    },
+    {
+      provide: AdminStaffService,
+      useFactory: (auditService: AdminAuditService) =>
+        new AdminStaffService(auditService),
+      inject: [AdminAuditService],
+    },
+    {
+      provide: AdminClientNoteService,
+      useFactory: (
+        firestoreService: FirestoreService,
+        auditService: AdminAuditService,
+      ) => new AdminClientNoteService(firestoreService, auditService),
       inject: [FirestoreService, AdminAuditService],
     },
   ],
