@@ -1,6 +1,7 @@
-import { IsEmail, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { UserType } from '../../domain/entities/firestore-user.entity';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
+// role, userType et traccarUserId ne sont pas modifiables par l'utilisateur :
+// traccarUserId est posé par POST /traccar/users et lu par TraccarLinkedGuard
 export class UpdateFirestoreUserDto {
   @IsOptional()
   @IsEmail()
@@ -9,14 +10,6 @@ export class UpdateFirestoreUserDto {
   @IsOptional()
   @IsString()
   name?: string;
-
-  @IsOptional()
-  @IsString()
-  role?: string;
-
-  @IsOptional()
-  @IsEnum(UserType)
-  userType?: UserType;
 
   @IsOptional()
   @IsString()
@@ -29,8 +22,4 @@ export class UpdateFirestoreUserDto {
   @IsOptional()
   @IsString()
   fcmToken?: string;
-
-  @IsOptional()
-  @IsInt()
-  traccarUserId?: number;
 }

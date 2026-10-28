@@ -1,8 +1,22 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { VehiculeService } from '../../core/application/services/vehicule.service';
 import { CreateVehiculeDto } from '../../core/application/dtos/create-vehicule.dto';
 import { UpdateVehiculeDto } from '../../core/application/dtos/update-vehicule.dto';
+import { StaffRole } from '../../core/domain/entities/staff-role';
+import { StaffAuthGuard } from '../guards/staff-auth.guard';
+import { StaffRoles } from '../decorators/staff-roles.decorator';
 
+// Parcours fleet owner (Prisma) non utilisé par le mobile : réservé au super_admin
+@UseGuards(StaffAuthGuard)
+@StaffRoles(StaffRole.SUPER_ADMIN)
 @Controller('vehicules')
 export class VehiculeController {
   constructor(private readonly vehiculeService: VehiculeService) {}

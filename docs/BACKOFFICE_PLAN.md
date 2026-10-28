@@ -96,13 +96,17 @@ Code écrit le 2026-10-28, build OK, routes protégées (401 sans token). **Test
 - Non couvert : les tests contre les vrais Firebase/Traccar (nécessitent un token staff et des données de test), `test/app.e2e-spec.ts` existant (dépend de l'infra réelle).
 - Lint : Prettier appliqué aux fichiers backoffice ; il reste 42 erreurs ESLint type-aware (surtout `require-await`/`no-unsafe-*` dans les tests). Le dépôt n'est pas propre au lint par ailleurs (123 erreurs hors backoffice).
 
-## Dette sécurité existante (hors backoffice, à corriger)
+## Dette sécurité existante (hors backoffice)
 
-1. `GET /users` et `GET /users/:id` (`firestore-user.controller.ts`) : accessibles à tout client connecté et sérialisent l'entité complète → **fuite de `traccarPassword` / `fcmToken`** de tous les utilisateurs. Restreindre à `id === req.user.id` et renvoyer un DTO sans secrets.
-2. `PUT` / `DELETE /users/:id` : aucune vérification que l'`id` est celui de l'appelant.
-3. `/traccar/groups`, `/companies`, `/vehicules` : aucun guard.
-4. Côté Cloud Functions (autre dépôt) : `activateSubscription` lit `uid` du payload ; endpoints `*Now` et `runSubscriptionMigration` sans garde d'auth.
-5. Changer les mots de passe des comptes de test partagés en clair pendant la session du 2026-10-12.
-6. `POST /files/upload` (`file-upload.controller.ts`) : **aucun guard** — upload anonyme vers le compte Cloudinary, `folder` libre.
-7. Documents clients stockés en Cloudinary public (`type: upload`) : toute `fileUrl` est accessible sans authentification.
-8. À vérifier : `PUT /traccar/devices/:id` envoie un objet partiel à Traccar, qui remplace l'entité entière → risque d'effacement des champs absents.
+Mise à jour 2026-10-28. D'après la spec, le mobile n'appelle que `/traccar/*` et `/files/upload` ; le landing page n'appelle pas le backend.
+
+1. ✅ `GET /users` → réservé au `super_admin`. `GET/PUT/DELETE /users/:id` → limités au propre compte (403 sinon). Toutes les réponses `/users*` (y compris `/me` et `/register`) passent par `toPublicUser()` : plus de `traccarPassword` ni `fcmToken`.
+2. ✅ `PUT /users/:id` n'accepte plus `traccarUserId`, `role`, `userType` (400). `traccarUserId` était falsifiable et lu par `TraccarLinkedGuard` → `POST /traccar/devices` pouvait rattacher un device au compte Traccar d'un autre client.
+3. ✅ `/traccar/groups` (appelait Traccar avec les identifiants **admin**, sans auth), `/companies`, `/vehicules` → `StaffAuthGuard` + `super_admin`.
+4. ⏳ `POST /files/upload` : aucun guard, `folder` libre. **En attente** : vérifier que le datasource Flutter envoie le token (`requiresAuth: true`) avant d'ajouter `FirebaseAuthGuard`.
+5. ⏳ Documents Cloudinary publics (`type: upload`) : toute `fileUrl` est accessible sans authentification.
+6. ⏳ À vérifier : `PUT /traccar/devices/:id` envoie un objet partiel à Traccar, qui remplace l'entité → risque d'effacement des champs absents.
+7. Hors dépôt (Cloud Functions) : `activateSubscription` lit `uid` du payload ; endpoints `*Now` et `runSubscriptionMigration` sans garde d'auth.
+8. Action manuelle : changer les mots de passe des comptes de test partagés en clair pendant la session du 2026-10-12.
+
+Tests : `src/infrastructure/controllers/security-hardening.spec.ts`.
