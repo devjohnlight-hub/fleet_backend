@@ -1,0 +1,19 @@
+$kind: http-request
+description: |-
+  Mise à jour partielle.
+method: PUT
+url: "{{baseUrl}}/traccar/notifications/:id"
+order: 5000
+pathVariables:
+  - key: "id"
+    value: "8"
+    description: "ID Traccar"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "notificators": "firebase"
+    }

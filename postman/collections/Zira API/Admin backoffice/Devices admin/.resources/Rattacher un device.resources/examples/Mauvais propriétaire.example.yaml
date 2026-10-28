@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Mauvais propriétaire"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId/link"
+  method: POST
+response:
+  statusCode: 400
+  statusText: "Bad Request"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Le véhicule n'appartient pas à ce client",
+        "data": null
+      }

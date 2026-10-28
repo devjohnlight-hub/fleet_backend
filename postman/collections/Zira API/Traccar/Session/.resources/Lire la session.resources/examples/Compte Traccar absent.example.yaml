@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Compte Traccar absent"
+order: 1000
+request:
+  url: "{{baseUrl}}/traccar/session"
+  method: GET
+response:
+  statusCode: 404
+  statusText: "Not Found"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Aucun compte Traccar associé à cet utilisateur",
+        "data": null
+      }

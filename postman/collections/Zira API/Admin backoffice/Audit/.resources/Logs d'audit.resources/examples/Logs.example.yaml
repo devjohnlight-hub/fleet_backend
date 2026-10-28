@@ -1,0 +1,45 @@
+$kind: http-example
+name: "Logs"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/audit-logs?limit=50"
+  method: GET
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "items": [
+            {
+              "id": "log_1",
+              "actorUid": "uid_staff_1",
+              "actorEmail": "support@zira.ci",
+              "actorRole": "support",
+              "requestId": "5f0c…",
+              "action": "device.disable",
+              "targetType": "device",
+              "targetId": "42",
+              "result": "success",
+              "reason": "Demande du client par téléphone (ticket #1234)",
+              "before": {
+                "disabled": false
+              },
+              "after": {
+                "disabled": true
+              },
+              "error": null,
+              "createdAt": "2026-10-28T09:18:00.000Z"
+            }
+          ],
+          "nextCursor": null,
+          "hasMore": false
+        }
+      }

@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Suppression définitive.
+method: DELETE
+url: "{{baseUrl}}/traccar/drivers/:id"
+order: 4000
+pathVariables:
+  - key: "id"
+    value: "3"
+    description: "ID Traccar"
+examples: "./.resources/Supprimer un chauffeur.resources/examples"

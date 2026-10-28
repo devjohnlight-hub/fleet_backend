@@ -1,0 +1,39 @@
+$kind: http-request
+description: |-
+  Tout rôle staff. Pagination par curseur (`nextCursor` = dernier ID). `orphanVehicles` (véhicules pointant un device absent) n'est renvoyé que sur la première page.
+method: GET
+url: "{{baseUrl}}/admin/v1/devices?limit=50"
+order: 1000
+queryParams:
+  - key: "limit"
+    value: "50"
+    description: "1 à 100, défaut 50"
+  - key: "cursor"
+    value: ""
+    description: "nextCursor de la page précédente"
+    disabled: true
+  - key: "clientId"
+    value: "uid_client_123"
+    description: "UID du client"
+    disabled: true
+  - key: "status"
+    value: "offline"
+    description: "online, offline, unknown"
+    disabled: true
+  - key: "staleBefore"
+    value: "2026-10-27T00:00:00Z"
+    description: "Dernier signal antérieur à cette date (ou jamais vu)"
+    disabled: true
+  - key: "neverSeen"
+    value: "true"
+    description: "Jamais vu"
+    disabled: true
+  - key: "disabled"
+    value: "true"
+    description: "Désactivés"
+    disabled: true
+  - key: "unlinked"
+    value: "true"
+    description: "Sans véhicule"
+    disabled: true
+examples: "./.resources/Lister les devices (admin).resources/examples"

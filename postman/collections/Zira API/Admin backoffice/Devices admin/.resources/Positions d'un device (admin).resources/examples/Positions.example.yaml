@@ -1,0 +1,41 @@
+$kind: http-example
+name: "Positions"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId/positions?from=2026-10-27T00:00:00Z&to=2026-10-28T00:00:00Z"
+  method: GET
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": [
+          {
+            "id": 9001,
+            "deviceId": 42,
+            "protocol": "gt06",
+            "serverTime": "2026-10-28T09:12:01.000Z",
+            "deviceTime": "2026-10-28T09:12:00.000Z",
+            "fixTime": "2026-10-28T09:12:00.000Z",
+            "outdated": false,
+            "valid": true,
+            "latitude": 5.3364,
+            "longitude": -4.0267,
+            "altitude": 12,
+            "speed": 0,
+            "course": 90,
+            "address": null,
+            "accuracy": 0,
+            "attributes": {
+              "ignition": false
+            }
+          }
+        ]
+      }

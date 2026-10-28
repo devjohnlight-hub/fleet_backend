@@ -1,0 +1,6 @@
+$kind: http-request
+description: |-
+  Génère un secret TOTP Traccar.
+method: POST
+url: "{{baseUrl}}/traccar/users/totp"
+order: 3000

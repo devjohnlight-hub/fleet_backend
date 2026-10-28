@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Fenêtre trop large"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId/positions?from=2026-10-27T00:00:00Z&to=2026-10-28T00:00:00Z"
+  method: GET
+response:
+  statusCode: 400
+  statusText: "Bad Request"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Fenêtre limitée à 7 jours",
+        "data": null
+      }

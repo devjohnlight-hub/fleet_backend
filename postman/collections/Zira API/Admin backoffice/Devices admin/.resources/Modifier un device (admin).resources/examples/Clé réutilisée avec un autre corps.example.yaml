@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Clé réutilisée avec un autre corps"
+order: 5000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId"
+  method: PATCH
+response:
+  statusCode: 422
+  statusText: "Unprocessable Entity"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Idempotency-Key déjà utilisée avec un autre corps de requête",
+        "data": null
+      }

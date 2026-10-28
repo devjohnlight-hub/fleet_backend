@@ -1,0 +1,7 @@
+$kind: http-request
+description: |-
+  Parcourt tous les comptes Firebase Auth et garde ceux qui ont un rôle staff.
+method: GET
+url: "{{baseUrl}}/admin/v1/staff"
+order: 1000
+examples: "./.resources/Lister le staff.resources/examples"

@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Suppression définitive du document.
+method: DELETE
+url: "{{baseUrl}}/vehicles/:id"
+order: 5000
+pathVariables:
+  - key: "id"
+    value: "veh_abc"
+    description: "ID Firestore"
+examples: "./.resources/Supprimer un véhicule.resources/examples"

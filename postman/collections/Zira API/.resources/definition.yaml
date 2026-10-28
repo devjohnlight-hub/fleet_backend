@@ -1,0 +1,37 @@
+$kind: collection
+name: Zira API
+description: |-
+  API backend Zira (NestJS) : comptes clients, véhicules, façade Traccar (GPS) et API du backoffice interne.
+
+  ## Environnements
+  Sélectionnez **Local** ou **Production**. Renseignez les identifiants (variables `secret`), puis lancez :
+  - **Utilisateurs › Connexion client** → remplit `firebaseIdToken` ;
+  - **Admin backoffice › Connexion staff** → remplit `staffIdToken`.
+
+  Les ID tokens Firebase expirent au bout d'une heure : relancez la connexion.
+
+  ## Authentification
+  | Token | Variable | Utilisé par |
+  |---|---|---|
+  | ID token Firebase client | `firebaseIdToken` | Défaut de la collection |
+  | ID token Firebase staff (claim `staffRole`) | `staffIdToken` | Admin backoffice, `GET /users`, Traccar › Groupes, Entreprises, Véhicules fleet owner |
+  | JWT fleet owner | `fleetOwnerJwt` | Fleet owners |
+
+  ## Réponses
+  Toutes les réponses JSON sont enveloppées :
+  ```json
+  { "success": true, "message": "Succès", "data": { } }
+  ```
+  Erreurs : `{ "success": false, "message": "…", "data": null }`. Les erreurs de validation (400) concatènent les messages avec `, `. Les `POST` réussis renvoient 201, les suppressions 204 sans corps.
+
+  ## Points ouverts
+  Les failles connues sont signalées par ⚠️ dans les dossiers concernés.
+variables:
+  - key: "baseUrl"
+    value: "http://localhost:3000"
+    description: "Remplacé par l'environnement sélectionné"
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: "{{firebaseIdToken}}"

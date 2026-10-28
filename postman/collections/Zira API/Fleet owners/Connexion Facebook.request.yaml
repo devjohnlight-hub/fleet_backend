@@ -1,0 +1,8 @@
+$kind: http-request
+description: |-
+  Redirige vers Facebook OAuth. À ouvrir dans un navigateur.
+method: GET
+url: "{{baseUrl}}/fleet-owners/auth/facebook"
+order: 5000
+auth:
+  type: noauth

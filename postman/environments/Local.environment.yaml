@@ -1,0 +1,42 @@
+name: Local
+values:
+  - key: baseUrl
+    value: "http://localhost:3000"
+    enabled: true
+    type: default
+    description: URL de l'API
+  - key: firebaseIdToken
+    value: ''
+    enabled: true
+    type: secret
+    description: "ID token client (rempli par « Connexion client »)"
+  - key: staffIdToken
+    value: ''
+    enabled: true
+    type: secret
+    description: "ID token staff (rempli par « Connexion staff »)"
+  - key: fleetOwnerJwt
+    value: ''
+    enabled: true
+    type: secret
+    description: "JWT fleet owner (rempli par « Connexion fleet owner »)"
+  - key: clientEmail
+    value: ''
+    enabled: true
+    type: secret
+    description: "Email du compte client de test"
+  - key: clientPassword
+    value: ''
+    enabled: true
+    type: secret
+    description: "Mot de passe du compte client de test"
+  - key: staffEmail
+    value: ''
+    enabled: true
+    type: secret
+    description: "Email du compte staff"
+  - key: staffPassword
+    value: ''
+    enabled: true
+    type: secret
+    description: "Mot de passe du compte staff"

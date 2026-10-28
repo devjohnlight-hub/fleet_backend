@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  `support`, `super_admin`. Champs : `name`, `uniqueId`, `groupId`, `phone`, `model`, `contact`, `category`. Le device complet est renvoyé à Traccar ; un nouveau `uniqueId` est recopié sur les véhicules liés.
+method: PATCH
+url: "{{baseUrl}}/admin/v1/devices/:deviceId"
+order: 4000
+pathVariables:
+  - key: "deviceId"
+    value: "42"
+    description: "ID Traccar"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+  - key: "Idempotency-Key"
+    value: "{{$guid}}"
+    description: "Optionnel. Rejouer avec la même clé renvoie la réponse déjà calculée (24 h). 409 si en cours, 422 si le corps diffère."
+body:
+  type: json
+  content: |-
+    {
+      "name": "Tracker Corolla",
+      "reason": "Demande du client par téléphone (ticket #1234)"
+    }
+examples: "./.resources/Modifier un device (admin).resources/examples"

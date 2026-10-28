@@ -1,0 +1,23 @@
+$kind: http-request
+description: |-
+  Chauffeurs visibles par le compte Traccar.
+method: GET
+url: "{{baseUrl}}/traccar/drivers"
+order: 1000
+queryParams:
+  - key: "deviceId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "groupId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "userId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "all"
+    value: "false"
+    description: "Admin Traccar"
+    disabled: true

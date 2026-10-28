@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Suppression définitive du compte Traccar.
+method: DELETE
+url: "{{baseUrl}}/traccar/users/:id"
+order: 5000
+pathVariables:
+  - key: "id"
+    value: "7"
+    description: "ID Traccar"
+examples: "./.resources/Supprimer un compte Traccar.resources/examples"

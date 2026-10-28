@@ -1,0 +1,7 @@
+$kind: http-request
+description: |-
+  Profil du client connecté.
+method: GET
+url: "{{baseUrl}}/users/me"
+order: 3000
+examples: "./.resources/Mon profil.resources/examples"

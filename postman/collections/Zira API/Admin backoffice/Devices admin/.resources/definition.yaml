@@ -1,0 +1,8 @@
+$kind: collection
+description: |-
+  Inventaire Traccar multi-clients, croisé avec Firestore.
+
+  `issues[]` : `NO_VEHICLE`, `MULTIPLE_VEHICLES`, `UNIQUE_ID_MISMATCH`, `OWNER_NOT_FOUND`, `OWNER_NOT_LINKED_TRACCAR`, et sur le détail `OWNER_NO_TRACCAR_PERMISSION`. Les incohérences sont signalées, jamais corrigées.
+
+  Panne Traccar → 502.
+order: 1000

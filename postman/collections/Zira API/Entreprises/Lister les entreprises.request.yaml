@@ -1,0 +1,7 @@
+$kind: http-request
+description: |-
+  Toutes les entreprises.
+method: GET
+url: "{{baseUrl}}/companies"
+order: 2000
+examples: "./.resources/Lister les entreprises.resources/examples"

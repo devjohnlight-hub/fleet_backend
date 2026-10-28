@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Mise à jour partielle (mêmes champs que la création, plus `deviceId` et `uniqueId`).
+method: PUT
+url: "{{baseUrl}}/vehicles/:id"
+order: 4000
+pathVariables:
+  - key: "id"
+    value: "veh_abc"
+    description: "ID Firestore"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "color": "Noir"
+    }
+examples: "./.resources/Modifier un véhicule.resources/examples"

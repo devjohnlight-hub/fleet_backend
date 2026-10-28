@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Règles de notification Traccar.
+order: 7000

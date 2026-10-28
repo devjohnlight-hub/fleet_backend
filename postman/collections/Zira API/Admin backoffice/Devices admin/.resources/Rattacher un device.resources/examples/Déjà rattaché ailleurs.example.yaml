@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Déjà rattaché ailleurs"
+order: 3000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId/link"
+  method: POST
+response:
+  statusCode: 409
+  statusText: "Conflict"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Véhicule déjà rattaché au device 17",
+        "data": null
+      }

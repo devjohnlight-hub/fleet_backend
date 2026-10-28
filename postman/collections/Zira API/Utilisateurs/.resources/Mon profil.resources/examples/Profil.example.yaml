@@ -1,0 +1,29 @@
+$kind: http-example
+name: "Profil"
+order: 1000
+request:
+  url: "{{baseUrl}}/users/me"
+  method: GET
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "id": "uid_client_123",
+          "email": "client@example.com",
+          "name": "Awa Koné",
+          "role": "owner",
+          "userType": "owner",
+          "phoneNumber": "+2250700000000",
+          "photoUrl": null,
+          "traccarUserId": 7
+        }
+      }

@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Champ interdit"
+order: 2000
+request:
+  url: "{{baseUrl}}/users/:id"
+  method: PUT
+response:
+  statusCode: 400
+  statusText: "Bad Request"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "property traccarUserId should not exist",
+        "data": null
+      }

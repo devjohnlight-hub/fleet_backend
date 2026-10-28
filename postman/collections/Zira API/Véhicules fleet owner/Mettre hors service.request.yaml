@@ -1,0 +1,10 @@
+$kind: http-request
+description: |-
+  Passe le statut à `hors_service`.
+method: PATCH
+url: "{{baseUrl}}/vehicules/:id/hors-service"
+order: 7000
+pathVariables:
+  - key: "id"
+    value: "1"
+    description: "ID Prisma"

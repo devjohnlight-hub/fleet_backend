@@ -1,0 +1,23 @@
+$kind: http-request
+description: |-
+  Liste des comptes Traccar.
+method: GET
+url: "{{baseUrl}}/traccar/users"
+order: 2000
+queryParams:
+  - key: "userId"
+    value: ""
+    description: "Filtre Traccar"
+    disabled: true
+  - key: "limit"
+    value: "50"
+    description: "Pagination"
+    disabled: true
+  - key: "offset"
+    value: "0"
+    description: "Pagination"
+    disabled: true
+  - key: "keyword"
+    value: ""
+    description: "Recherche"
+    disabled: true

@@ -1,0 +1,27 @@
+$kind: http-request
+description: |-
+  Règles visibles par le compte Traccar.
+method: GET
+url: "{{baseUrl}}/traccar/notifications"
+order: 1000
+queryParams:
+  - key: "deviceId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "groupId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "userId"
+    value: ""
+    description: "Filtre"
+    disabled: true
+  - key: "refresh"
+    value: "false"
+    description: "Forcer le rafraîchissement"
+    disabled: true
+  - key: "all"
+    value: "false"
+    description: "Admin Traccar"
+    disabled: true

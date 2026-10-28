@@ -1,0 +1,11 @@
+$kind: collection
+description: |-
+  Véhicules de la base Prisma (`/vehicules`). **Réservé au staff `super_admin`** (token staff).
+
+  `type` : `moto`, `voiture`, `camion`, `bus`, `autre`. `statut` : `actif`, `maintenance`, `hors_service`.
+order: 7000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: "{{staffIdToken}}"

@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Rôle insuffisant"
+order: 1000
+request:
+  url: "{{baseUrl}}/traccar/groups"
+  method: GET
+response:
+  statusCode: 403
+  statusText: "Forbidden"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Rôle insuffisant pour cette action",
+        "data": null
+      }

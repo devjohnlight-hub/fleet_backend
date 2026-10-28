@@ -1,0 +1,11 @@
+$kind: http-request
+description: |-
+  Tout rôle staff. Device, véhicule, client, dernière position et attributs.
+method: GET
+url: "{{baseUrl}}/admin/v1/devices/:deviceId"
+order: 2000
+pathVariables:
+  - key: "deviceId"
+    value: "42"
+    description: "ID Traccar"
+examples: "./.resources/Détail d'un device (admin).resources/examples"

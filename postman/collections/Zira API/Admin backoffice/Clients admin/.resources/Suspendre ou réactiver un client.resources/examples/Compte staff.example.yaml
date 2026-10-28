@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Compte staff"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/clients/:uid/access"
+  method: PATCH
+response:
+  statusCode: 403
+  statusText: "Forbidden"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Seul un super_admin peut modifier l'accès d'un compte staff",
+        "data": null
+      }

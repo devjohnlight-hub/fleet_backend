@@ -1,0 +1,17 @@
+$kind: http-request
+description: |-
+  `notificators` : liste séparée par des virgules.
+method: POST
+url: "{{baseUrl}}/traccar/notifications"
+order: 4000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "type": "geofenceExit",
+      "always": true,
+      "notificators": "web,firebase"
+    }

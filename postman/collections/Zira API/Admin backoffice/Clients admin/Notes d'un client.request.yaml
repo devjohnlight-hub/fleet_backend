@@ -1,0 +1,19 @@
+$kind: http-request
+description: |-
+  `support`, `billing`, `super_admin`. Plus récentes d'abord.
+method: GET
+url: "{{baseUrl}}/admin/v1/clients/:uid/notes?limit=50"
+order: 2000
+pathVariables:
+  - key: "uid"
+    value: "uid_client_123"
+    description: "UID Firebase"
+queryParams:
+  - key: "limit"
+    value: "50"
+    description: "1 à 100"
+  - key: "cursor"
+    value: ""
+    description: "nextCursor de la page précédente"
+    disabled: true
+examples: "./.resources/Notes d'un client.resources/examples"

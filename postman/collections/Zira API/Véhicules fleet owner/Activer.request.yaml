@@ -1,0 +1,10 @@
+$kind: http-request
+description: |-
+  Passe le statut à `actif`.
+method: PATCH
+url: "{{baseUrl}}/vehicules/:id/activer"
+order: 6000
+pathVariables:
+  - key: "id"
+    value: "1"
+    description: "ID Prisma"

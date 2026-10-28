@@ -1,0 +1,38 @@
+$kind: http-example
+name: "Traccar injoignable"
+order: 2000
+request:
+  url: "{{baseUrl}}/admin/v1/health"
+  method: GET
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "status": "degraded",
+          "checkedAt": "2026-10-28T09:15:00.000Z",
+          "checks": {
+            "firestore": {
+              "status": "up",
+              "latencyMs": 85
+            },
+            "redis": {
+              "status": "up",
+              "latencyMs": 2
+            },
+            "traccar": {
+              "status": "down",
+              "latencyMs": 10001,
+              "error": "The operation was aborted due to timeout"
+            }
+          }
+        }
+      }

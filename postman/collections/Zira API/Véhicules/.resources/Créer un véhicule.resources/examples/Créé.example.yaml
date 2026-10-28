@@ -1,0 +1,36 @@
+$kind: http-example
+name: "Créé"
+order: 1000
+request:
+  url: "{{baseUrl}}/vehicles"
+  method: POST
+response:
+  statusCode: 201
+  statusText: "Created"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "id": "veh_abc",
+          "brand": "Toyota",
+          "color": "Gris",
+          "label": "Corolla",
+          "ownerId": "uid_client_123",
+          "plate": "AB-1234-CI",
+          "registrationNumber": "CI-2024-001",
+          "status": "available",
+          "type": "Voiture",
+          "year": 2021,
+          "photoUrl": null,
+          "vin": null,
+          "createdAt": null,
+          "deviceId": null,
+          "uniqueId": null
+        }
+      }

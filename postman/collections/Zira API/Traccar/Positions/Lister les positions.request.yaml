@@ -1,0 +1,25 @@
+$kind: http-request
+description: |-
+  Avec `deviceId` (et `from`/`to` en ISO-8601) : historique du device. Avec `id` : une position. Sans filtre : la dernière position de chaque device du client.
+
+  Aucune limite de période côté serveur.
+method: GET
+url: "{{baseUrl}}/traccar/positions?deviceId=42"
+order: 1000
+queryParams:
+  - key: "deviceId"
+    value: "42"
+    description: "ID Traccar du device"
+  - key: "from"
+    value: "2026-10-27T00:00:00Z"
+    description: "Début ISO-8601"
+    disabled: true
+  - key: "to"
+    value: "2026-10-28T00:00:00Z"
+    description: "Fin ISO-8601"
+    disabled: true
+  - key: "id"
+    value: ""
+    description: "ID de position"
+    disabled: true
+examples: "./.resources/Lister les positions.resources/examples"

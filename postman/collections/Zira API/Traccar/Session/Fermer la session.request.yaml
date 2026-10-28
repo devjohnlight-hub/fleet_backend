@@ -1,0 +1,7 @@
+$kind: http-request
+description: |-
+  Ferme la session Traccar.
+method: DELETE
+url: "{{baseUrl}}/traccar/session"
+order: 3000
+examples: "./.resources/Fermer la session.resources/examples"

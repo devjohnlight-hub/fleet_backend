@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Journal des mutations admin (`admin_audit_logs`, append-only, données sensibles masquées).
+order: 5000

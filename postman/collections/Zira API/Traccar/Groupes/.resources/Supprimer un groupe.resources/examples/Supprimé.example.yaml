@@ -1,0 +1,13 @@
+$kind: http-example
+name: "Supprimé"
+order: 1000
+request:
+  url: "{{baseUrl}}/traccar/groups/:id"
+  method: DELETE
+response:
+  statusCode: 204
+  statusText: "No Content"
+  headers: []
+  body:
+    type: text
+    content: ''

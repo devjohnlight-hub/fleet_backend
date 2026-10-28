@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Sans token"
+order: 3000
+request:
+  url: "{{baseUrl}}/admin/v1/health"
+  method: GET
+response:
+  statusCode: 401
+  statusText: "Unauthorized"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Token Firebase manquant",
+        "data": null
+      }

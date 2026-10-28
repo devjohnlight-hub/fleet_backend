@@ -1,0 +1,10 @@
+$kind: http-request
+description: |-
+  Liste par fleet owner.
+method: GET
+url: "{{baseUrl}}/vehicules/fleet/:fleetOwnerId"
+order: 3000
+pathVariables:
+  - key: "fleetOwnerId"
+    value: "1"
+    description: "ID Prisma"

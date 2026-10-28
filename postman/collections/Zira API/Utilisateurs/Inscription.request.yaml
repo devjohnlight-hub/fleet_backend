@@ -1,0 +1,25 @@
+$kind: http-request
+description: |-
+  Crée le compte Firebase Auth et le profil `users/{uid}`. Route publique.
+
+  `userType` : `owner`, `driver` ou `admin`.
+method: POST
+url: "{{baseUrl}}/users/register"
+order: 1000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "email": "client@example.com",
+      "password": "MotDePasse!2026",
+      "name": "Awa Koné",
+      "role": "owner",
+      "userType": "owner",
+      "phoneNumber": "+2250700000000"
+    }
+auth:
+  type: noauth
+examples: "./.resources/Inscription.resources/examples"

@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Traccar indisponible"
+order: 3000
+request:
+  url: "{{baseUrl}}/admin/v1/devices?limit=50"
+  method: GET
+response:
+  statusCode: 502
+  statusText: "Bad Gateway"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Traccar indisponible : Traccar GET /api/devices failed: 503",
+        "data": null
+      }

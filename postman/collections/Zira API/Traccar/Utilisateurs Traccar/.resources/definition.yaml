@@ -1,0 +1,6 @@
+$kind: collection
+description: |-
+  Comptes Traccar.
+
+  ⚠️ **Faille connue** : `GET`, `PUT` et `DELETE` utilisent les identifiants **admin** Traccar et ne vérifient pas l'appelant — tout client connecté peut lister, modifier ou supprimer n'importe quel compte Traccar.
+order: 2000

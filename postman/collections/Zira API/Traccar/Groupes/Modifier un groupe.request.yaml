@@ -1,0 +1,19 @@
+$kind: http-request
+description: |-
+  Mise à jour partielle.
+method: PUT
+url: "{{baseUrl}}/traccar/groups/:id"
+order: 3000
+pathVariables:
+  - key: "id"
+    value: "2"
+    description: "ID Traccar"
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "name": "Flotte Abidjan Nord"
+    }

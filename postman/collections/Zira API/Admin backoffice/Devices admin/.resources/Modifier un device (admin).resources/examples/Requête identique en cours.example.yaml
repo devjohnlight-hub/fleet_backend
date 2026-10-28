@@ -1,0 +1,20 @@
+$kind: http-example
+name: "Requête identique en cours"
+order: 4000
+request:
+  url: "{{baseUrl}}/admin/v1/devices/:deviceId"
+  method: PATCH
+response:
+  statusCode: 409
+  statusText: "Conflict"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "message": "Une requête avec cette Idempotency-Key est déjà en cours",
+        "data": null
+      }

@@ -1,0 +1,31 @@
+$kind: http-example
+name: "Modifié"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/staff/:uid"
+  method: PATCH
+response:
+  statusCode: 200
+  statusText: "OK"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "member": {
+            "uid": "uid_staff_1",
+            "email": "support@zira.ci",
+            "displayName": "Support Zira",
+            "role": "billing",
+            "disabled": false,
+            "mfaEnrolled": true,
+            "lastSignInTime": "Tue, 28 Oct 2026 08:00:00 GMT"
+          },
+          "changed": true
+        }
+      }

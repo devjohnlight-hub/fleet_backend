@@ -1,0 +1,6 @@
+$kind: collection
+description: |-
+  Véhicules Firestore (`vehicles/{id}`).
+
+  ⚠️ **Faille connue** : aucune vérification de propriétaire — tout client connecté peut lister, lire, modifier ou supprimer n'importe quel véhicule.
+order: 2000

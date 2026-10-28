@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Multipart, champ `file`. Les images sont stockées en `image`, le reste en `raw`. Renvoie l'URL publique permanente.
+method: POST
+url: "{{baseUrl}}/files/upload?folder=fleet"
+order: 1000
+queryParams:
+  - key: "folder"
+    value: "fleet"
+    description: "Dossier Cloudinary (défaut : fleet)"
+body:
+  type: formdata
+  content:
+    - key: "file"
+      type: file
+      src: ""
+      description: "Fichier à envoyer"
+auth:
+  type: noauth
+examples: "./.resources/Uploader un fichier.resources/examples"

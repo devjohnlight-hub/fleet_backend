@@ -1,0 +1,27 @@
+$kind: http-example
+name: "Créée"
+order: 1000
+request:
+  url: "{{baseUrl}}/admin/v1/clients/:uid/notes"
+  method: POST
+response:
+  statusCode: 201
+  statusText: "Created"
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Succès",
+        "data": {
+          "id": "note_1",
+          "clientId": "uid_client_123",
+          "body": "Client rappelé, boîtier remplacé.",
+          "authorUid": "uid_staff_1",
+          "authorEmail": "support@zira.ci",
+          "createdAt": "2026-10-28T09:20:00.000Z"
+        }
+      }

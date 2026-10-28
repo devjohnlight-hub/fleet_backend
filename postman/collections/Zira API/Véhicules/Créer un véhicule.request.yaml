@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  `type` : `Voiture`, `Moto`, `Fourgon`. `status` : `available`, `assigned`, `maintenance`, `inactive`.
+method: POST
+url: "{{baseUrl}}/vehicles"
+order: 3000
+headers:
+  - key: "Content-Type"
+    value: "application/json"
+body:
+  type: json
+  content: |-
+    {
+      "brand": "Toyota",
+      "color": "Gris",
+      "label": "Corolla",
+      "ownerId": "uid_client_123",
+      "plate": "AB-1234-CI",
+      "registrationNumber": "CI-2024-001",
+      "status": "available",
+      "type": "Voiture",
+      "year": 2021
+    }
+examples: "./.resources/Créer un véhicule.resources/examples"
