@@ -86,10 +86,15 @@ Code écrit le 2026-10-28, build OK, routes protégées (401 sans token). **Test
 - [ ] `POST /admin/v1/jobs/:name/run` — **reporté** : nécessite le dépôt Cloud Functions (URLs et sécurisation des endpoints `*Now`).
 - Index Firestore composites probablement requis : `admin_client_notes (clientId, createdAt desc)` et `admin_audit_logs (<filtre>, createdAt desc)` — le lien de création apparaît dans l'erreur `FAILED_PRECONDITION`.
 
-### Étape 6 — Tests
-- [ ] Tests unitaires `StaffAuthGuard` (sans token, token client, rôle insuffisant, rôle OK).
-- [ ] Tests `AdminAuditService.redact`.
-- [ ] Tests e2e : `viewer` ne peut faire aucune mutation ; aucun champ secret dans les réponses.
+### ✅ Étape 6 — Tests (2026-10-28)
+`npx jest` (unitaires) et `npx jest --config ./test/jest-e2e.json test/admin.e2e-spec.ts` (e2e) — **81 tests, tous verts**. Vérifié que les tests échouent bien si une route de mutation est ouverte à `viewer`.
+
+- [x] `staff-auth.guard.spec.ts` : sans token, Bearer absent, token invalide/révoqué, `checkRevoked`, compte client (403), claim inconnu, rôle insuffisant, rôle OK + `req.staff`, `X-Request-Id`.
+- [x] `admin-audit.service.spec.ts` : masquage (casse, profondeur, tableaux), aucune valeur secrète écrite, `record()` succès/échec.
+- [x] `admin.module.spec.ts` : inspection des métadonnées de **toutes** les routes — `StaffAuthGuard` sur chaque controller, chaque mutation restreinte sans `viewer` et avec `IdempotencyInterceptor`, staff réservé au `super_admin`. Une nouvelle route mal protégée fait échouer ce test.
+- [x] `test/admin.e2e-spec.ts` (Firestore/Redis/Traccar simulés, `test/support/fake-firestore.ts`) : 401 sans token, 403 compte client, `viewer` refusé sur les 9 mutations sans effet de bord ni audit, séparation support/billing, aucun `traccarPassword`/`fcmToken` dans `GET /devices` et `/devices/:id`, mutation autorisée + audit, 400 sans motif, rejeu `Idempotency-Key` et 422.
+- Non couvert : les tests contre les vrais Firebase/Traccar (nécessitent un token staff et des données de test), `test/app.e2e-spec.ts` existant (dépend de l'infra réelle).
+- Lint : Prettier appliqué aux fichiers backoffice ; il reste 42 erreurs ESLint type-aware (surtout `require-await`/`no-unsafe-*` dans les tests). Le dépôt n'est pas propre au lint par ailleurs (123 erreurs hors backoffice).
 
 ## Dette sécurité existante (hors backoffice, à corriger)
 
