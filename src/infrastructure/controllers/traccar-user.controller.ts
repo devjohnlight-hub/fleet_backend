@@ -20,7 +20,9 @@ import { FirestoreUserService } from '../../core/application/services/firestore-
 import { CreateTraccarUserDto } from '../../core/application/dtos/create-traccar-user.dto';
 import { UpdateTraccarUserDto } from '../../core/application/dtos/update-traccar-user.dto';
 import { FirebaseAuthGuard } from '../guards/firebase-auth.guard';
-import { TraccarLinkedGuard } from '../guards/traccar-linked.guard';
+import { StaffAuthGuard } from '../guards/staff-auth.guard';
+import { StaffRoles } from '../decorators/staff-roles.decorator';
+import { StaffRole } from '../../core/domain/entities/staff-role';
 
 @UseGuards(FirebaseAuthGuard)
 @Controller('traccar/users')
@@ -30,7 +32,10 @@ export class TraccarUserController {
     private readonly firestoreUserService: FirestoreUserService,
   ) {}
 
+  // Identifiants Traccar admin : lecture de tous les comptes → super_admin uniquement
   @Get()
+  @UseGuards(StaffAuthGuard)
+  @StaffRoles(StaffRole.SUPER_ADMIN)
   findAll(
     @Query('userId') userId?: string,
     @Query('limit') limit?: string,
@@ -66,6 +71,8 @@ export class TraccarUserController {
   }
 
   @Put(':id')
+  @UseGuards(StaffAuthGuard)
+  @StaffRoles(StaffRole.SUPER_ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTraccarUserDto,
@@ -74,6 +81,8 @@ export class TraccarUserController {
   }
 
   @Delete(':id')
+  @UseGuards(StaffAuthGuard)
+  @StaffRoles(StaffRole.SUPER_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.traccarUserService.delete(id);

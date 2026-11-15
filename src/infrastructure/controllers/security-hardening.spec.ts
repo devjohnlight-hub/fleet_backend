@@ -10,6 +10,8 @@ import { FirestoreUserController } from './firestore-user.controller';
 import { CompanyController } from './company.controller';
 import { VehiculeController } from './vehicule.controller';
 import { TraccarGroupController } from './traccar-group.controller';
+import { TraccarUserController } from './traccar-user.controller';
+import { FirestoreVehicleController } from './firestore-vehicle.controller';
 import { FirestoreUserService } from '../../core/application/services/firestore-user.service';
 import { UpdateFirestoreUserDto } from '../../core/application/dtos/update-firestore-user.dto';
 import {
@@ -109,7 +111,12 @@ describe('FirestoreUserController — accès et secrets', () => {
 
 describe('Controllers hors mobile réservés au super_admin', () => {
   it.each(
-    [CompanyController, VehiculeController, TraccarGroupController].map((c) => [
+    [
+      CompanyController,
+      VehiculeController,
+      TraccarGroupController,
+      FirestoreVehicleController,
+    ].map((c) => [
       c.name,
       c,
     ]),
@@ -121,4 +128,32 @@ describe('Controllers hors mobile réservés au super_admin', () => {
       StaffRole.SUPER_ADMIN,
     ]);
   });
+});
+
+describe('TraccarUserController — routes admin Traccar', () => {
+  const proto = TraccarUserController.prototype as unknown as Record<
+    string,
+    () => unknown
+  >;
+
+  it.each(['findAll', 'update', 'delete'])(
+    '%s est réservé au super_admin',
+    (method) => {
+      expect(Reflect.getMetadata(GUARDS_METADATA, proto[method])).toContain(
+        StaffAuthGuard,
+      );
+      expect(Reflect.getMetadata(STAFF_ROLES_KEY, proto[method])).toEqual([
+        StaffRole.SUPER_ADMIN,
+      ]);
+    },
+  );
+
+  it.each(['create', 'generateTotp'])(
+    '%s reste accessible au client mobile',
+    (method) => {
+      expect(
+        Reflect.getMetadata(GUARDS_METADATA, proto[method]),
+      ).toBeUndefined();
+    },
+  );
 });

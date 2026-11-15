@@ -14,9 +14,14 @@ import {
 import { FirestoreVehicleService } from '../../core/application/services/firestore-vehicle.service';
 import { CreateFirestoreVehicleDto } from '../../core/application/dtos/create-firestore-vehicle.dto';
 import { UpdateFirestoreVehicleDto } from '../../core/application/dtos/update-firestore-vehicle.dto';
-import { FirebaseAuthGuard } from '../guards/firebase-auth.guard';
+import { StaffRole } from '../../core/domain/entities/staff-role';
+import { StaffAuthGuard } from '../guards/staff-auth.guard';
+import { StaffRoles } from '../decorators/staff-roles.decorator';
 
-@UseGuards(FirebaseAuthGuard)
+// Non utilisé par le mobile (accès Firestore direct) ni par le backoffice (Admin SDK).
+// Aucun contrôle de propriétaire → réservé au super_admin.
+@UseGuards(StaffAuthGuard)
+@StaffRoles(StaffRole.SUPER_ADMIN)
 @Controller('vehicles')
 export class FirestoreVehicleController {
   constructor(

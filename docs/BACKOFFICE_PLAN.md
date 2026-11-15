@@ -1,7 +1,7 @@
 # Backoffice Zira — plan d'action backend
 
 > Suivi de l'implémentation côté `fleet_backend` (NestJS) des routes d'administration décrites dans `docs/BACKOFFICE_SPEC.md`.
-> Dernière mise à jour : 2026-10-28.
+> Dernière mise à jour : 2026-11-10.
 
 ## Principe
 
@@ -106,9 +106,12 @@ Mise à jour 2026-10-28. D'après la spec, le mobile n'appelle que `/traccar/*` 
 4. ⏳ `POST /files/upload` : aucun guard, `folder` libre. **En attente** : vérifier que le datasource Flutter envoie le token (`requiresAuth: true`) avant d'ajouter `FirebaseAuthGuard`.
 5. ⏳ Documents Cloudinary publics (`type: upload`) : toute `fileUrl` est accessible sans authentification.
 6. ⏳ À vérifier : `PUT /traccar/devices/:id` envoie un objet partiel à Traccar, qui remplace l'entité → risque d'effacement des champs absents.
-6b. 🔴 `GET/PUT/DELETE /traccar/users[/:id]` (`traccar-user.controller.ts`) : identifiants **admin** Traccar, aucune vérification de l'appelant → tout client connecté peut lister, modifier ou supprimer n'importe quel compte Traccar. (Trouvé le 2026-10-28 en documentant l'API.)
-6c. `/vehicles` (`firestore-vehicle.controller.ts`) : aucune vérification de propriétaire → tout client connecté peut lister, lire, modifier ou supprimer n'importe quel véhicule.
+6b. ✅ (2026-11-10, tests à lancer) `GET /traccar/users`, `PUT/DELETE /traccar/users/:id` → `StaffAuthGuard` + `super_admin` au niveau méthode. `POST /traccar/users` et `/totp` restent ouverts au client connecté (onboarding mobile). Reste : `POST` écrase `traccarUserId` si le compte est déjà lié (compte Traccar orphelin).
+6c. ✅ (2026-11-10, tests à lancer) `/vehicles` (`firestore-vehicle.controller.ts`) → `StaffAuthGuard` + `super_admin` (route non utilisée par le mobile ni le backoffice, d'après la spec). À confirmer dans le dépôt Flutter : aucun appel REST à `/vehicles`.
 7. Hors dépôt (Cloud Functions) : `activateSubscription` lit `uid` du payload ; endpoints `*Now` et `runSubscriptionMigration` sans garde d'auth.
 8. Action manuelle : changer les mots de passe des comptes de test partagés en clair pendant la session du 2026-10-12.
 
 Tests : `src/infrastructure/controllers/security-hardening.spec.ts`.
+
+## Documentation
+- `docs/BACKOFFICE_API.md` (2026-11-10) : guide d'intégration Next.js — auth staff, matrice des rôles, contrats de toutes les routes `/admin/v1/*`, lectures Admin SDK, checklist.
